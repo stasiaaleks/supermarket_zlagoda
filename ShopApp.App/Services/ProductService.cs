@@ -11,6 +11,7 @@ public interface IProductService
 public class ProductService : IProductService
 {
     private readonly IRepository<Product> _productRepo;
+    private readonly Dictionary<string, string> QueryMap = SqlQueryRegistry.SqlQueriesMap;
 
     public ProductService(IRepository<Product> productRepo)
     {
@@ -19,7 +20,6 @@ public class ProductService : IProductService
     
     public async Task<IEnumerable<Product>> GetAllProductsAsync()
     {
-        string filePath = "Data/sql/Product/get_all_products.sql";
-        return await _productRepo.GetAllAsync(filePath);
+        return await _productRepo.GetAllAsync(QueryMap[SqlQueryRegistry.SqlQueriesKeys.GetAllProducts]);
     }
 }

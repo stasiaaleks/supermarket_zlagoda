@@ -13,9 +13,9 @@ public class DbConnectionProvider : IConnectionProvider
 {
     private readonly string _connectionString;
 
-    public DbConnectionProvider(IConfiguration configuration)
+    public DbConnectionProvider(string connectionString)
     {
-        _connectionString = configuration.GetConnectionString("DevDBConnection");
+        _connectionString = connectionString;
     }
 
     public async Task<IDbConnection> Connect()

@@ -1,0 +1,1 @@
+SELECT * from products where barcode=@Id;

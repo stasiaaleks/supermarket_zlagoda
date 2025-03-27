@@ -1,18 +1,17 @@
 using Dapper;
-
-namespace ShopApp.Data.Repositories;
 using System.Linq.Expressions;
 
+namespace ShopApp.Data.Repositories;
 public interface IRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(int id);
-    Task<IEnumerable<T>> GetAllAsync(string queryFilePath);
+    Task<IEnumerable<T>> GetAllAsync(string query);
     Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate);
-    Task<int> AddAsync(T entity, object parameters, string queryFilePath);
+    Task<int> AddAsync(T entity, object parameters, string query);
     Task AddRangeAsync(IEnumerable<T> entities);
-    Task<int> UpdateAsync(T entity, object parameters, string queryFilePath);
+    Task<int> UpdateAsync(T entity, object parameters, string query);
     Task<int> UpdateRangeAsync(IEnumerable<T> entities);
-    Task<int> DeleteAsync(T entity, object parameters, string queryFilePath);
+    Task<int> DeleteAsync(T entity, object parameters, string query);
     void DeleteRangeAsync(IEnumerable<T> entities);
 }
 
@@ -30,11 +29,10 @@ public class Repository<T> : IRepository<T> where T : class
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(string queryFilePath)
+    public async Task<IEnumerable<T>> GetAllAsync(string query)
     {
-        string sql = SqlQueryLoader.LoadFromFile(queryFilePath);
         using var connection = await _dbConnectionProvider.Connect();
-        return await connection.QueryAsync<T>(sql);
+        return await connection.QueryAsync<T>(query);
     }
 
     public Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
@@ -42,11 +40,10 @@ public class Repository<T> : IRepository<T> where T : class
         throw new NotImplementedException();
     }
 
-    public async Task<int> AddAsync(T entity, object parameters, string queryFilePath)
+    public async Task<int> AddAsync(T entity, object parameters, string query)
     {
-        string sql = SqlQueryLoader.LoadFromFile(queryFilePath);
         using var connection = await _dbConnectionProvider.Connect();
-        return await connection.ExecuteScalarAsync<int>(sql, parameters);
+        return await connection.ExecuteScalarAsync<int>(query, parameters);
     }
 
     public Task AddRangeAsync(IEnumerable<T> entities)
@@ -54,11 +51,10 @@ public class Repository<T> : IRepository<T> where T : class
         throw new NotImplementedException();
     }
 
-    public async Task<int> UpdateAsync(T entity, object parameters, string queryFilePath)
+    public async Task<int> UpdateAsync(T entity, object parameters, string query)
     {
-        string sql = SqlQueryLoader.LoadFromFile(queryFilePath);
         using var connection = await _dbConnectionProvider.Connect();
-        await connection.ExecuteAsync(sql, parameters);
+        await connection.ExecuteAsync(query, parameters);
         return 0; // return id later
     }
 
@@ -67,11 +63,10 @@ public class Repository<T> : IRepository<T> where T : class
         throw new NotImplementedException();
     }
 
-    public async Task<int> DeleteAsync(T entity, object parameters, string queryFilePath)
+    public async Task<int> DeleteAsync(T entity, object parameters, string query)
     {
-        string sql = SqlQueryLoader.LoadFromFile(queryFilePath);
         using var connection = await _dbConnectionProvider.Connect();
-        await connection.ExecuteAsync(sql, parameters);
+        await connection.ExecuteAsync(query, parameters);
         return 0; // return id later
     }
 
