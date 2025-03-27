@@ -15,7 +15,11 @@ public class Program
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
             .Build();
-
+        string connectionString = configuration.GetConnectionString("DevDBConnection") 
+                                  ?? throw new InvalidOperationException("Connection string 'DevDBConnection' not found.");
+        
+        
+        services.AddSingleton(connectionString);
         services.AddDataServices();
         services.AddScoped<ICmdCreator, MigrateCmdCreator>();
         services.AddSingleton<IConfiguration>(configuration);
