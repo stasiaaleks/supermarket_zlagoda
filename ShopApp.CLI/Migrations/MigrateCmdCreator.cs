@@ -9,7 +9,9 @@ public interface ICmdCreator
 
 public class MigrateCmdCreator : ICmdCreator
 {
-    private MigrationRunner _migrationRunner;
+    private readonly MigrationRunner _migrationRunner;
+    private readonly Option<string> _fileOption = new("--file", "Path to the SQL migration file");
+    private readonly Option<bool> _allOption = new("--all", "Run all migration files");
 
     public MigrateCmdCreator(MigrationRunner migrationRunner)
     {
@@ -20,50 +22,61 @@ public class MigrateCmdCreator : ICmdCreator
     {
         var migrateCommand = new Command("migrate", "Run database migrations");
 
-        var fileOption = new Option<string>(
-            name: "--file",
-            description: "The path to the migration SQL file");
-        fileOption.AddAlias("-f");
-        migrateCommand.AddOption(fileOption);
-
-        var allOption = new Option<bool>(
-            name: "--all",
-            description: "Run all migrations in the default directory");
-        allOption.AddAlias("-a");
-        migrateCommand.AddOption(allOption);
+        migrateCommand.AddOption(_allOption);
+        migrateCommand.AddOption(_fileOption);
         
-        migrateCommand.SetHandler(async (string file, bool all) =>
-        {
-            if (all)
-            {
-                string baseDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../.."));
-                string migrationsPath = Path.Combine(baseDir, "Migrations", "migrations_sql");
-
-                Console.WriteLine($"Running all migrations from {migrationsPath}");
-
-                if (Directory.Exists(migrationsPath))
-                {
-                    foreach (var sqlFile in Directory.GetFiles(migrationsPath, "*.sql"))
-                    {
-                        Console.WriteLine($"Executing {Path.GetFileName(sqlFile)}...");
-                        await _migrationRunner.Run(sqlFile);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"Migrations directory not found: {migrationsPath}");
-                }
-            }
-            else if (!string.IsNullOrEmpty(file))
-            {
-                Console.WriteLine($"Running migration: {file}");
-                await _migrationRunner.Run(file);
-            }
-            else
-            {
-                Console.WriteLine("Please specify a migration file with --file or use --all to run all migrations");
-            }
-        }, fileOption, allOption);
+        SetCmdHandler(migrateCommand);
         return migrateCommand;
     }
+
+    private void SetCmdHandler(Command cmd)
+    {
+        cmd.SetHandler(CmdHandler, _fileOption, _allOption);
+    }
+
+    private async Task CmdHandler(string file, bool all)
+    {
+        if (all) {
+            await RunAll();
+        }
+        else if (!string.IsNullOrEmpty(file)) {
+            await RunFile(file);
+        }
+        else { // no options fallback
+            RunNoOptions();
+        }
+    }
+
+    private async Task RunAll()
+    {
+        string baseDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../.."));
+        string migrationsPath = Path.Combine(baseDir, "Migrations", "migrations_sql");
+
+        Console.WriteLine($"Running all migrations from {migrationsPath}");
+
+        if (Directory.Exists(migrationsPath))
+        {
+            foreach (var sqlFile in Directory.GetFiles(migrationsPath, "*.sql"))
+            {
+                Console.WriteLine($"Executing {Path.GetFileName(sqlFile)}...");
+                await _migrationRunner.Run(sqlFile);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Migrations directory not found: {migrationsPath}");
+        }
+    }
+
+    private async Task RunFile(string filePath)
+    {
+        Console.WriteLine($"Running migration: {filePath}");
+        await _migrationRunner.Run(filePath);
+    }
+    
+    private void RunNoOptions()
+    {
+        Console.WriteLine("Please specify a migration file with --file or use --all to run all migrations");
+    }
+
 }
