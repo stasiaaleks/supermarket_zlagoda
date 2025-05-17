@@ -12,7 +12,7 @@ public interface ISqlQueryRegistry
 
 public class SqlQueryRegistry: ISqlQueryRegistry
 {
-    private readonly Dictionary<string, string> _queryMap = new(); // SqlQueryRegistry is a singleton
+    private readonly Dictionary<string, string> _queryMap = new();
 
     public SqlQueryRegistry() => LoadEmbeddedSqlResources();
     
@@ -26,11 +26,7 @@ public class SqlQueryRegistry: ISqlQueryRegistry
     
     private void LoadEmbeddedSqlResources()
     {
-        //var assembly = typeof(SqlQueryRegistry).Assembly;
-        //var assembly = Assembly.GetExecutingAssembly(); // or typeof(SqlQueryRegistry).Assembly
-       // var assembly = Assembly.GetEntryAssembly(); // works
-        var assembly = Assembly.GetEntryAssembly()!;   // Program is in ShopApp.API
-
+        var assembly = Assembly.GetEntryAssembly()!;
         var resources = assembly.GetManifestResourceNames();
 
         foreach (var resource in resources.Where(r => r.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)))
@@ -39,13 +35,18 @@ public class SqlQueryRegistry: ISqlQueryRegistry
             using var reader = new StreamReader(stream!);
             string query = reader.ReadToEnd();
 
-            // Normalize key: Sql.Products.GetAll -> Products/GetAll
-            var key = resource
-                .Replace($"{assembly.GetName().Name}.Sql.", "") // Sql.Products.GetAll.sql
-                .Replace(".sql", "")
-                .Replace('.', '/');
-
+            var key = NormaliseKey(resource, assembly);
             _queryMap[key] = query;
         }
+    }
+    
+    private static string NormaliseKey(string resource, Assembly assembly)
+    {
+        // TODO: make this method more readable
+        var prefix = assembly.GetName().Name + ".";
+        var trimmed = resource.StartsWith(prefix) ? resource[prefix.Length..] : resource;
+        trimmed = trimmed[(trimmed.IndexOf("sql.", StringComparison.OrdinalIgnoreCase) + 4)..]; // after "sql." directory
+        trimmed = trimmed[..^4]; // strip  ".sql"
+        return trimmed.Replace('.', '/');
     }
 }
