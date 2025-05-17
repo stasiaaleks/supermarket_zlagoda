@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ShopApp.DAL.Queries;
 using ShopApp.Services;
 
 namespace ShopApp.Controllers;

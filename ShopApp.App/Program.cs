@@ -1,5 +1,4 @@
-using ShopApp.Data;
-using ShopApp.Data.Repositories;
+using ShopApp.DAL.Extensions;
 using ShopApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,15 +8,8 @@ string connectionString = builder.Configuration.GetConnectionString("DevDBConnec
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton(connectionString);
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddDataServices();
-
-builder.Services.AddSingleton(typeof(SqlQueryRegistry));
-
-var serviceProvider = builder.Services.BuildServiceProvider();
-var registry = serviceProvider.GetRequiredService<SqlQueryRegistry>();
-registry.FindAndMapAllQueries();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

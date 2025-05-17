@@ -1,7 +1,8 @@
-using Dapper;
 using System.Linq.Expressions;
+using Dapper;
+using ShopApp.DAL.DbConnection;
 
-namespace ShopApp.Data.Repositories;
+namespace ShopApp.DAL.Repository;
 public interface IRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(int id);

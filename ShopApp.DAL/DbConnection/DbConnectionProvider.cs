@@ -1,7 +1,7 @@
-using System.Data;
+﻿using System.Data;
 using Npgsql;
 
-namespace ShopApp.Data;
+namespace ShopApp.DAL.DbConnection;
 
 public interface IConnectionProvider
 {

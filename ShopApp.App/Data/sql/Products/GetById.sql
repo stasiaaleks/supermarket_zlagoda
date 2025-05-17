@@ -1,0 +1,1 @@
+SELECT * from product where id_product=@Id;

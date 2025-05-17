@@ -1,5 +1,7 @@
+using ShopApp.DAL.Queries;
+using ShopApp.DAL.Repository;
 using ShopApp.Data.Entities;
-using ShopApp.Data.Repositories;
+using ShopApp.Data.sql;
 
 namespace ShopApp.Services;
 
@@ -11,15 +13,17 @@ public interface IProductService
 public class ProductService : IProductService
 {
     private readonly IRepository<Product> _productRepo;
-    private readonly Dictionary<string, string> QueryMap = SqlQueryRegistry.SqlQueriesMap;
+    private readonly ISqlQueryRegistry _sqlQueryRegistry;
 
-    public ProductService(IRepository<Product> productRepo)
+    public ProductService(IRepository<Product> productRepo, ISqlQueryRegistry sqlQueryRegistry)
     {
         _productRepo = productRepo;
+        _sqlQueryRegistry = sqlQueryRegistry;
     }
     
     public async Task<IEnumerable<Product>> GetAllProductsAsync()
     {
-        return await _productRepo.GetAllAsync(QueryMap[SqlQueryRegistry.SqlQueriesKeys.GetAllProducts]);
+        var query = _sqlQueryRegistry.Get(SqlQueries.GetAllProducts);
+        return await _productRepo.GetAllAsync(query);
     }
 }

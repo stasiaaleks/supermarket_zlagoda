@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ShopApp.CLI.Migrations;
-using ShopApp.Data;
+using ShopApp.DAL.Extensions;
 
 namespace ShopApp.CLI;
 
