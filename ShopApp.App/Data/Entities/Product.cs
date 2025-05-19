@@ -1,16 +1,14 @@
-namespace ShopApp.Data.Entities;
-
 public interface IProduct
 {
-    int Barcode { get; set; }
-    string Name { get; set; }
-    decimal Price { get; set; }
-    
+    int IdProduct { get; set; }
+    int CategoryNumber { get; set; }
+    string ProductName { get; set; }
+    string Characteristics { get; set; }
 }
-
 public class Product : IProduct
 {
-    public int Barcode { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
+    public int IdProduct { get; set; }
+    public int CategoryNumber { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public string Characteristics { get; set; } = string.Empty;
 }
