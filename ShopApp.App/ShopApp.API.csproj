@@ -25,13 +25,10 @@
   <ItemGroup>
     <ProjectReference Include="..\ShopApp.DAL\ShopApp.DAL.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <ProjectReference Include="..\ShopApp.DAL\ShopApp.DAL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Data\sql\Products\*.sql" />
+    <EmbeddedResource Include="Data\sql\Product\*.sql" />
+    <EmbeddedResource Include="Data\sql\Category\*.sql" />
   </ItemGroup>
 
 </Project>
