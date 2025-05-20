@@ -2,10 +2,10 @@
 public interface IEmployee
 {
     string IdEmployee { get; set; }
-    string Surname { get; set; }
-    string Name { get; set; }
-    string Patronymic { get; set; }
-    string Role { get; set; }
+    string EmplSurname { get; set; }
+    string EmplName { get; set; }
+    string EmplPatronymic { get; set; }
+    string EmplRole { get; set; }
     decimal Salary { get; set; }
     DateTime DateOfBirth { get; set; }
     DateTime DateOfStart { get; set; }
@@ -17,10 +17,10 @@ public interface IEmployee
 public class Employee : IEmployee
 {
     public string IdEmployee { get; set; } = string.Empty;
-    public string Surname { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Patronymic { get; set; } = string.Empty;
-    public string Role { get; set; } = string.Empty;
+    public string EmplSurname { get; set; } = string.Empty;
+    public string EmplName { get; set; } = string.Empty;
+    public string EmplPatronymic { get; set; } = string.Empty;
+    public string EmplRole { get; set; } = string.Empty;
     public decimal Salary { get; set; }
     public DateTime DateOfBirth { get; set; }
     public DateTime DateOfStart { get; set; }

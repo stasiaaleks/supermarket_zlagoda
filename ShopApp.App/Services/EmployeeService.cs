@@ -31,7 +31,7 @@ public class EmployeeService: IEmployeeService
         var employee = await _employeeRepo.GetSingleAsync(query, new { Username = username }); 
         
         if (employee == null)
-            throw new KeyNotFoundException($"Employee with username '{username}' not found.");
+            throw new NullReferenceException($"Employee with username '{username}' not found.");
 
         return employee;
     }
@@ -41,9 +41,9 @@ public class EmployeeService: IEmployeeService
         var query = _sqlQueryRegistry.Load(_queryProvider.GetById); 
         var employee = await _employeeRepo.GetByIdAsync(query, id);
         
-        if (employee == null || string.IsNullOrEmpty(employee.Role))
-            throw new KeyNotFoundException($"Employee with ID '{id}' not found or role is missing.");
+        if (employee == null || string.IsNullOrEmpty(employee.EmplRole))
+            throw new NullReferenceException($"Employee with ID '{id}' not found or role is missing.");
 
-        return employee.Role;
+        return employee.EmplRole;
     }
 }
