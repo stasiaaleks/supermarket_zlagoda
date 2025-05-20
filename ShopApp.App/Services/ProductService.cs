@@ -1,6 +1,5 @@
 using ShopApp.DAL.Queries;
 using ShopApp.DAL.Repository;
-using ShopApp.Data.Entities;
 using ShopApp.Data.QueriesAccess;
 
 namespace ShopApp.Services;

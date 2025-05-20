@@ -31,10 +31,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\SQL\Product\*.sql" />
     <EmbeddedResource Include="Data\SQL\Category\*.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Data\DTO\" />
+    <EmbeddedResource Include="Data\SQL\User\*.sql" />
+    <EmbeddedResource Include="Data\SQL\Employee\*.sql" />
+    
   </ItemGroup>
 
 </Project>

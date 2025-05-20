@@ -16,19 +16,18 @@ public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        // TODO: this is WIP method for authentication process
-        
+        // TODO: needs tidying up
         var httpContext = context.HttpContext;
         var user = httpContext.User;
         var employeeService = httpContext.RequestServices.GetService<IEmployeeService>();
-
+        
         if (user.Identity == null || employeeService == null || !user.Identity.IsAuthenticated)
         {
             context.Result = new UnauthorizedResult();
             return;
         }
 
-        var username = user.Identity.Name; // needs configuration
+        var username = user.Identity.Name;
         var employee = await employeeService.GetEmployeeByUsernameAsync(username);
         if (employee == null)
         {
@@ -37,7 +36,7 @@ public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
         }
 
         var role = await employeeService.GetEmployeeRoleAsync(employee.IdEmployee);
-        if (!string.Equals(_allowedRole, role, StringComparison.OrdinalIgnoreCase)) // case-insencitive
+        if (!string.Equals(_allowedRole, role, StringComparison.OrdinalIgnoreCase)) // case-insensitive role
         {
             context.Result = new ForbidResult();
 
