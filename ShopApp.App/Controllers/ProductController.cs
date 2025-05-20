@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using ShopApp.DAL.Queries;
+using ShopApp.Data.Enums;
 using ShopApp.Services;
+using ShopApp.Services.Auth;
 
 namespace ShopApp.Controllers;
 
@@ -16,6 +17,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
+    [VerifyRole(EmployeeRoles.Manager)]
     public async Task<IActionResult> GetAllProducts()
     {
         var products = await _productService.GetAllProductsAsync();

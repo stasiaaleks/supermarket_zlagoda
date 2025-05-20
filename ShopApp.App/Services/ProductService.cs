@@ -25,7 +25,7 @@ public class ProductService : IProductService
     
     public async Task<IEnumerable<Product>> GetAllProductsAsync()
     {
-        var query = _sqlQueryRegistry.Load(_queryProvider.GetAllPath);
+        var query = _sqlQueryRegistry.Load(_queryProvider.GetAll);
         return await _productRepo.GetAllAsync(query);
     }
 }

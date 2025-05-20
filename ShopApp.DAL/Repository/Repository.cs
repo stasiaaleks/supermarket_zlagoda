@@ -5,7 +5,8 @@ using ShopApp.DAL.DbConnection;
 namespace ShopApp.DAL.Repository;
 public interface IRepository<T> where T : class
 {
-    Task<T?> GetByIdAsync(int id);
+    Task<T?> GetByIdAsync(string query, string id);
+    Task<T?> GetSingleAsync(string query, object parameters);
     Task<IEnumerable<T>> GetAllAsync(string query);
     Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate);
     Task<int> AddAsync(T entity, object parameters, string query);
@@ -25,15 +26,22 @@ public class Repository<T> : IRepository<T> where T : class
         _dbConnectionProvider = dbConnectionProvider;
     }
     
-    public Task<T?> GetByIdAsync(int id)
+    public async Task<T?> GetByIdAsync(string query, string id)
     {
-        throw new NotImplementedException();
+        using var connection = await _dbConnectionProvider.Connect();
+        return await connection.QueryFirstAsync<T>(query, id);
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(string query)
     {
         using var connection = await _dbConnectionProvider.Connect();
         return await connection.QueryAsync<T>(query);
+    }
+
+    public async Task<T?> GetSingleAsync(string query, object parameters)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        return await connection.QuerySingleAsync<T>(query, parameters);
     }
 
     public Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
