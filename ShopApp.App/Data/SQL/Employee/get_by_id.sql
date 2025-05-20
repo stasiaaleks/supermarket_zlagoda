@@ -1,0 +1,1 @@
+SELECT * from employee where id_employee=@Id;
