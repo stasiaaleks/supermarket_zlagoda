@@ -16,7 +16,7 @@ public interface IUserRepository
 }
 
 
-public class UserRepository : RawRepository<User>, IUserRepository
+public class UserRepository : Repository<User>, IUserRepository
 {
     private readonly IReadonlyRegistry _sqlQueryRegistry;
     
@@ -41,13 +41,13 @@ public class UserRepository : RawRepository<User>, IUserRepository
     public Task<T?> GetSingleAsync<T>(string queryFilePath, object? parameters = null)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath); 
-        return QuerySingleValueAsync<T>(query, parameters);
+        return QuerySingleAsync<T>(query, parameters);
     }
 
     public Task<IEnumerable<User>> GetListAsync(string queryFilePath, object? parameters = null)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath); 
-        return QueryAsync(query);
+        return QueryListAsync(query);
     }
 
     public Task<int> CreateAsync(User entity, string queryFilePath)

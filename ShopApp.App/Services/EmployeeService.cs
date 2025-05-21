@@ -14,11 +14,11 @@ public interface IEmployeeService
 
 public class EmployeeService: IEmployeeService
 {
-    private readonly IRepository<Employee> _employeeRepo;
+    private readonly IDapperRepository<Employee> _employeeRepo;
     private readonly IReadonlyRegistry _sqlQueryRegistry;
     private readonly EmployeeQueryProvider _queryProvider;
     
-    public EmployeeService(IRepository<Employee> employeeRepo, IReadonlyRegistry sqlQueryRegistry, EmployeeQueryProvider queryProvider)
+    public EmployeeService(IDapperRepository<Employee> employeeRepo, IReadonlyRegistry sqlQueryRegistry, EmployeeQueryProvider queryProvider)
     {
         _employeeRepo = employeeRepo;
         _sqlQueryRegistry = sqlQueryRegistry;

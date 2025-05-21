@@ -19,7 +19,6 @@ builder.Services.AddDataServices();
 builder.Services.AddBusinessLogicServices();
 builder.Services.AddQueryProviders();
 
-//  
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 builder.Services.AddAutoMapper(typeof(Program));
 

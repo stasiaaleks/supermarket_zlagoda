@@ -1,91 +1,80 @@
-using System.Linq.Expressions;
-using Dapper;
+using Npgsql;
+using System.Data;
+using System.Reflection;
 using ShopApp.DAL.DbConnection;
 
 namespace ShopApp.DAL.Repository;
+
+
 public interface IRepository<T> where T : class
 {
-    Task<T?> GetByIdAsync(string query, string id);
-    Task<T?> GetSingleAsync(string query, object? parameters = null);
-    Task<IEnumerable<T>> GetAllAsync(string query);
-    Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate);
-    Task<int> AddAsync(T entity, string query, object? parameters = null);
-    Task AddRangeAsync(IEnumerable<T> entities);
-    Task<int> UpdateAsync(T entity, string query, object? parameters = null);
-    Task<int> UpdateRangeAsync(IEnumerable<T> entities);
-    Task<int> DeleteAsync(T entity, string query, object? parameters = null);
-    void DeleteRangeAsync(IEnumerable<T> entities);
+    Task<IEnumerable<T>> QueryListAsync(string sql, object? parameters = null);
+    Task<int> ExecuteAsync(string sql, object? parameters = null);
+    Task<TK?> QuerySingleAsync<TK>(string sql, object? parameters = null);
 }
 
-public class Repository<T> : IRepository<T> where T : class
+public abstract class Repository<T>: IRepository<T> where T : class
 {
     private readonly IConnectionProvider _dbConnectionProvider;
 
-    public Repository(IConnectionProvider dbConnectionProvider)
+    protected Repository(IConnectionProvider dbConnectionProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
     }
-    
-    public async Task<T?> GetByIdAsync(string query, string id)
-    {
-        using var connection = await _dbConnectionProvider.Connect();
-        return await connection.QuerySingleAsync<T>(query, new { Id = id });
-    }
 
-    public async Task<IEnumerable<T>> GetAllAsync(string query)
+    public async Task<IEnumerable<T>> QueryListAsync(string sql, object? parameters = null)
     {
-        using var connection = await _dbConnectionProvider.Connect();
-        return await connection.QueryAsync<T>(query);
-    }
+        var results = new List<T>();
 
-        public async Task<T?> GetSingleAsync(string query, object? parameters = null)
+        using var connection = await _dbConnectionProvider.Connect();
+        await using var command = new NpgsqlCommand(sql, (NpgsqlConnection)connection);
+
+        if (parameters != null)
+            command.Parameters.AddRange(ToNpgsqlParameters(parameters));
+
+        await using var reader = await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
         {
-            using var connection = await _dbConnectionProvider.Connect();
-            return await connection.QuerySingleAsync<T>(query, parameters);
+            results.Add(Map(reader));
         }
 
-    public Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
-    {
-        throw new NotImplementedException();
+        return results;
     }
 
-    public Task<int> AddAsync(T entity, string query, object? parameters = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<int> AddAsync(T entity, object parameters, string query)
+    public async Task<int> ExecuteAsync(string sql, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();
-        return await connection.ExecuteScalarAsync<int>(query, parameters);
-    }
+        await using var command = new NpgsqlCommand(sql, (NpgsqlConnection)connection);
 
-    public Task AddRangeAsync(IEnumerable<T> entities)
-    {
-        throw new NotImplementedException();
-    }
+        if (parameters != null)
+            command.Parameters.AddRange(ToNpgsqlParameters(parameters));
 
-    public async Task<int> UpdateAsync(T entity, string query, object? parameters = null)
-    {
-        using var connection = await _dbConnectionProvider.Connect();
-        await connection.ExecuteAsync(query, parameters);
-        return 0; // return id later
+        return await command.ExecuteNonQueryAsync();
     }
-
-    public Task<int> UpdateRangeAsync(IEnumerable<T> entities)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<int> DeleteAsync(T entity, string query, object? parameters = null)
+    
+    public async Task<TK?> QuerySingleAsync<TK>(string sql, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();
-        await connection.ExecuteAsync(query, parameters);
-        return 0; // return id later
+        await using var command = new NpgsqlCommand(sql, (NpgsqlConnection)connection);
+
+        if (parameters != null)
+            command.Parameters.AddRange(ToNpgsqlParameters(parameters));
+
+        var result = await command.ExecuteScalarAsync();
+        if (result == null || result == DBNull.Value)
+            return default;
+
+        return (TK)Convert.ChangeType(result, typeof(T));
     }
 
-    public void DeleteRangeAsync(IEnumerable<T> entities)
+    protected abstract T Map(IDataRecord record);
+
+    private NpgsqlParameter[] ToNpgsqlParameters(object obj)
     {
-        throw new NotImplementedException();
+        return obj.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(p => new NpgsqlParameter("@" + p.Name, p.GetValue(obj) ?? DBNull.Value))
+            .ToArray();
     }
 }

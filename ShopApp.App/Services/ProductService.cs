@@ -11,11 +11,11 @@ public interface IProductService
 
 public class ProductService : IProductService
 {
-    private readonly IRepository<Product> _productRepo;
+    private readonly IDapperRepository<Product> _productRepo;
     private readonly IReadonlyRegistry _sqlQueryRegistry;
     private readonly ProductQueryProvider _queryProvider;
 
-    public ProductService(IRepository<Product> productRepo, IReadonlyRegistry sqlQueryRegistry, ProductQueryProvider queryProvider)
+    public ProductService(IDapperRepository<Product> productRepo, IReadonlyRegistry sqlQueryRegistry, ProductQueryProvider queryProvider)
     {
         _productRepo = productRepo;
         _sqlQueryRegistry = sqlQueryRegistry;
