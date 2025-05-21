@@ -9,7 +9,7 @@ namespace ShopApp.Repositories;
 
 public interface IEmployeeRepository
 {
-    Task<T?> GetSingleAsync<T>(string queryFilePath, object? parameters = null);
+    Task<Employee?> GetSingleAsync(string queryFilePath, object? parameters = null);
     Task<IEnumerable<Employee>> GetListAsync(string queryFilePath, object? parameters = null);
     Task<Employee?> GetByIdAsync(string queryFilePath, string id);
     Task<Employee?> CreateAsync(Employee entity, string queryFilePath);
@@ -46,10 +46,10 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
         };
     }
 
-    public Task<T?> GetSingleAsync<T>(string queryFilePath, object? parameters = null)
+    public Task<Employee?> GetSingleAsync(string queryFilePath, object? parameters = null)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath); 
-        return QuerySingleAsync<T>(query, parameters);
+        return QuerySingleAsync(query, parameters);
     }
 
     public Task<IEnumerable<Employee>> GetListAsync(string queryFilePath, object? parameters = null)
@@ -60,7 +60,8 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
 
     public Task<Employee?> GetByIdAsync(string queryFilePath, string id)
     {
-        return QuerySingleAsync<Employee>(queryFilePath, new { Id = id });
+        var query = _sqlQueryRegistry.Load(queryFilePath); 
+        return QuerySingleAsync(query, new { Id = id });
     }
 
     public Task<Employee?> CreateAsync(Employee entity, string queryFilePath)

@@ -8,7 +8,7 @@ namespace ShopApp.Repositories;
 
 public interface IUserRepository
 {
-    Task<T?> GetSingleAsync<T>(string queryFilePath, object? parameters = null);
+    Task<User?> GetSingleAsync(string queryFilePath, object? parameters = null);
     Task<IEnumerable<User>> GetListAsync(string queryFilePath, object? parameters = null);
     Task<User?> CreateAsync(User entity, string queryFilePath);
     Task<User?> UpdateAsync(User entity, string queryFilePath);
@@ -30,7 +30,7 @@ public class UserRepository : Repository<User>, IUserRepository
     {
         return new User
         {
-            UserId = record.GetInt32(record.GetOrdinal("id")),
+            UserId = record.GetInt32(record.GetOrdinal("user_id")),
             Username = record.GetString(record.GetOrdinal("username")),
             PasswordHash = record.GetString(record.GetOrdinal("password_hash")),
             PasswordSalt = record.GetString(record.GetOrdinal("password_salt")),
@@ -38,10 +38,10 @@ public class UserRepository : Repository<User>, IUserRepository
         };
     }
 
-    public Task<T?> GetSingleAsync<T>(string queryFilePath, object? parameters = null)
+    public Task<User?> GetSingleAsync(string queryFilePath, object? parameters = null)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath); 
-        return QuerySingleAsync<T>(query, parameters);
+        return QuerySingleAsync(query, parameters);
     }
 
     public Task<IEnumerable<User>> GetListAsync(string queryFilePath, object? parameters = null)

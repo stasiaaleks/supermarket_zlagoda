@@ -27,7 +27,7 @@ public class UserService: IUserService
 
     public async Task<User> GetByUsername(string username)
     {
-        var user = await _userRepo.GetSingleAsync<User>(_queryProvider.GetByUsername, new { Username = username }); 
+        var user = await _userRepo.GetSingleAsync(_queryProvider.GetByUsername, new { Username = username }); 
         if (user == null)
             throw new KeyNotFoundException($"User with username '{username}' not found.");
 

@@ -33,8 +33,8 @@ public class EmployeeService: IEmployeeService
     
     public async Task<Employee> GetEmployeeByUsernameAsync(string username)
     {
-        var query = _sqlQueryRegistry.Load(_queryProvider.GetByUsername); 
-        var employee = await _employeeRepo.GetSingleAsync<Employee>(query, new { Username = username }); 
+        var query = _queryProvider.GetByUsername; 
+        var employee = await _employeeRepo.GetSingleAsync(query, new { Username = username }); 
         
         if (employee == null)
             throw new NullReferenceException($"Employee with username '{username}' not found.");
@@ -44,7 +44,7 @@ public class EmployeeService: IEmployeeService
 
     public async Task<string> GetEmployeeRoleAsync(string id)
     {
-        var query = _sqlQueryRegistry.Load(_queryProvider.GetById); 
+        var query = _queryProvider.GetById; 
         var employee = await _employeeRepo.GetByIdAsync(query, id);
         
         if (employee == null || string.IsNullOrEmpty(employee.Role))
