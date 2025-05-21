@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ShopApp.DAL.Extensions;
-using ShopApp.Data.QueriesAccess;
-using ShopApp.Services;
-using ShopApp.Services.Auth;
+using ShopApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,24 +16,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddSingleton(connectionString);
 builder.Services.AddDataServices();
+builder.Services.AddBusinessLogicServices();
+builder.Services.AddQueryProviders();
+
+//  
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-// entities services
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-
-// auth services
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
-
-
-// sql queries providers
-// TODO: consider refactoring as a factory instead of a concrete implementation
-builder.Services.AddScoped<ProductQueryProvider>();
-builder.Services.AddScoped<EmployeeQueryProvider>();
-builder.Services.AddScoped<CategoryQueryProvider>();
-builder.Services.AddScoped<UserQueryProvider>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
