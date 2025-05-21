@@ -9,7 +9,7 @@ namespace ShopApp.DAL.Repository;
 public interface IRepository<T> where T : class
 {
     Task<IEnumerable<T>> QueryListAsync(string sql, object? parameters = null);
-    Task<int> ExecuteAsync(string sql, object? parameters = null);
+    Task<T?> ExecuteAsync(string sql, object? parameters = null);
     Task<TK?> QuerySingleAsync<TK>(string sql, object? parameters = null);
 }
 
@@ -42,7 +42,7 @@ public abstract class Repository<T>: IRepository<T> where T : class
         return results;
     }
 
-    public async Task<int> ExecuteAsync(string sql, object? parameters = null)
+    public async Task<T?> ExecuteAsync(string sql, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();
         await using var command = new NpgsqlCommand(sql, (NpgsqlConnection)connection);
@@ -50,7 +50,9 @@ public abstract class Repository<T>: IRepository<T> where T : class
         if (parameters != null)
             command.Parameters.AddRange(ToNpgsqlParameters(parameters));
 
-        return await command.ExecuteNonQueryAsync();
+        var result = await command.ExecuteScalarAsync();
+        if (result == DBNull.Value) return default(T);
+        return (T?)result;
     }
     
     public async Task<TK?> QuerySingleAsync<TK>(string sql, object? parameters = null)
@@ -69,6 +71,8 @@ public abstract class Repository<T>: IRepository<T> where T : class
     }
 
     protected abstract T Map(IDataRecord record);
+    
+    // protected abstract object Map(T entity);
 
     private NpgsqlParameter[] ToNpgsqlParameters(object obj)
     {

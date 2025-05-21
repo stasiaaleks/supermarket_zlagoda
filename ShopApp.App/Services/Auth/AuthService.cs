@@ -1,3 +1,5 @@
+using AutoMapper;
+using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
     
 namespace ShopApp.Services.Auth;
@@ -6,19 +8,23 @@ namespace ShopApp.Services.Auth;
 public interface IAuthService
 {
     Task<User?> Authenticate(string username, string password);
-    Task<bool> Register(string username, string password);
+    Task<bool> Register(RegisterDto dto);
 }
 
 
 public class AuthService: IAuthService
 {
     private readonly IUserService _userService;
+    private readonly IEmployeeService _employeeService;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IMapper _mapper;
     
-    public AuthService(IUserService userService, IPasswordHasher passwordHasher)
+    public AuthService(IUserService userService, IPasswordHasher passwordHasher, IMapper mapper, IEmployeeService employeeService)
     {
         _userService = userService;
         _passwordHasher = passwordHasher;
+        _mapper = mapper;
+        _employeeService = employeeService;
     }
 
     public async Task<User?> Authenticate(string username, string password)
@@ -31,9 +37,12 @@ public class AuthService: IAuthService
         return isValid ? user : null;
     }
 
-    public async Task<bool> Register(string username, string password)
+    public async Task<bool> Register(RegisterDto dto)
     {
-        // TBI
-        return true;
+        var employeeDto = _mapper.Map<EmployeeDto>(dto);
+        var newEmployeeId = await _employeeService.CreateEmployee(employeeDto);
+        var newUserId = await _userService.CreateUser(dto.Username, dto.Password, newEmployeeId);
+
+        return newEmployeeId != null && newUserId != null;
     }
 }

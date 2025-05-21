@@ -10,9 +10,9 @@ public interface IUserRepository
 {
     Task<T?> GetSingleAsync<T>(string queryFilePath, object? parameters = null);
     Task<IEnumerable<User>> GetListAsync(string queryFilePath, object? parameters = null);
-    Task<int> CreateAsync(User entity, string queryFilePath);
-    Task<int> UpdateAsync(User entity, string queryFilePath);
-    Task<int> DeleteAsync(User entity, string queryFilePath);
+    Task<User?> CreateAsync(User entity, string queryFilePath);
+    Task<User?> UpdateAsync(User entity, string queryFilePath);
+    Task<User?> DeleteAsync(User entity, string queryFilePath);
 }
 
 
@@ -50,36 +50,36 @@ public class UserRepository : Repository<User>, IUserRepository
         return QueryListAsync(query);
     }
 
-    public Task<int> CreateAsync(User entity, string queryFilePath)
+    public Task<User?> CreateAsync(User entity, string queryFilePath)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath);
         var parameters = new
         {
-            username = entity.Username,
-            passwordhash = entity.PasswordHash,
-            passwordsalt = entity.PasswordSalt,
-            idemployee = entity.IdEmployee
+            Username = entity.Username,
+            PasswordHash = entity.PasswordHash,
+            PasswordSalt = entity.PasswordSalt,
+            IdEmployee = entity.IdEmployee
         };
 
         return ExecuteAsync(query, parameters);
     }
 
-    public Task<int> UpdateAsync(User entity, string queryFilePath)
+    public Task<User?> UpdateAsync(User entity, string queryFilePath)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath);
         var parameters = new
         {
-            userid = entity.UserId,
-            username = entity.Username,
-            passwordhash = entity.PasswordHash,
-            passwordsalt = entity.PasswordSalt,
-            idemployee = entity.IdEmployee
+            UserId = entity.UserId,
+            Username = entity.Username,
+            PasswordHash = entity.PasswordHash,
+            PasswordSalt = entity.PasswordSalt,
+            IdEmployee = entity.IdEmployee
         };
 
         return ExecuteAsync(query, parameters);
     }
 
-    public Task<int> DeleteAsync(User entity, string queryFilePath)
+    public Task<User?> DeleteAsync(User entity, string queryFilePath)
     {
         var query = _sqlQueryRegistry.Load(queryFilePath);
         var parameters = new { userid = entity.UserId };
