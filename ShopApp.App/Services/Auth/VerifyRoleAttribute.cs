@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ShopApp.Data.Enums;
@@ -7,39 +8,67 @@ namespace ShopApp.Services.Auth;
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
 {
-    private readonly string _allowedRole;
+    private readonly string[] _allowedRoles;
 
-    public VerifyRoleAttribute(EmployeeRoles allowedRole)
+    public VerifyRoleAttribute(params EmployeeRoles[] allowedRoles)
     {
-        _allowedRole = allowedRole.ToString().ToLower();
+        _allowedRoles = allowedRoles.Select(r => r.ToString()).ToArray();
     }
-
+    
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        // TODO: needs tidying up
         var httpContext = context.HttpContext;
         var user = httpContext.User;
-        var employeeService = httpContext.RequestServices.GetService<IEmployeeService>();
-        
-        if (user.Identity == null || employeeService == null || !user.Identity.IsAuthenticated)
+
+        if (!IsUserAuthenticated(user))
         {
             context.Result = new UnauthorizedResult();
             return;
         }
 
-        var username = user.Identity.Name;
-        var employee = await employeeService.GetEmployeeByUsernameAsync(username);
-        if (employee == null)
+        if (!TryGetUsername(user, out var username))
         {
             context.Result = new ForbidResult();
             return;
         }
 
-        var role = await employeeService.GetEmployeeRoleAsync(employee.IdEmployee);
-        if (!string.Equals(_allowedRole, role, StringComparison.OrdinalIgnoreCase)) // case-insensitive role
+        
+        if (!TryGetEmployeeService(httpContext, out var service))
         {
             context.Result = new ForbidResult();
-
+            return;
         }
+
+        if (service != null && !await IsUserAuthorized(service, username))
+        {
+            context.Result = new ForbidResult();
+            return;
+        }
+    }
+    
+    private bool IsUserAuthenticated(IPrincipal user)
+    {
+        return user.Identity != null && user.Identity.IsAuthenticated;
+    }
+
+    private bool TryGetUsername(IPrincipal user, out string? username)
+    {
+        username = user.Identity?.Name;
+        return !string.IsNullOrWhiteSpace(username);
+    }
+
+    private bool TryGetEmployeeService(HttpContext context, out IEmployeeService? employeeService)
+    {
+        employeeService = context.RequestServices.GetService<IEmployeeService>();
+        return employeeService != null;
+    }
+
+    private async Task<bool> IsUserAuthorized(IEmployeeService employeeService, string username)
+    {
+        var employee = await employeeService.GetEmployeeByUsernameAsync(username);
+        if (employee == null) return false;
+
+        var role = await employeeService.GetEmployeeRoleAsync(employee.IdEmployee);
+        return _allowedRoles.Contains(role, StringComparer.OrdinalIgnoreCase);
     }
 }
