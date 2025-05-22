@@ -1,6 +1,6 @@
+using ShopApp.DAL.Repository;
 using ShopApp.Data.Entities;
 using ShopApp.Data.QueriesAccess;
-using ShopApp.Repositories;
 using ShopApp.Services.Auth;
 
 namespace ShopApp.Services;
@@ -15,10 +15,10 @@ public interface IUserService
 public class UserService: IUserService
 {
     private readonly UserQueryProvider _queryProvider;
-    private readonly IUserRepository _userRepo;
+    private readonly IRepository<User> _userRepo;
     private readonly IPasswordHasher _passwordHasher;
 
-    public UserService(IUserRepository userRepo, UserQueryProvider queryProvider, IPasswordHasher passwordHasher)
+    public UserService(IRepository<User> userRepo, UserQueryProvider queryProvider, IPasswordHasher passwordHasher)
     {
         _userRepo = userRepo;
         _queryProvider = queryProvider;
@@ -44,8 +44,10 @@ public class UserService: IUserService
             IdEmployee = idEmployee,
             Username = username
         };
-        var query = _queryProvider.CreateSingle;
-        var createdEntity = await _userRepo.CreateAsync(userToCreate, query);
-        return createdEntity.UserId;
+   
+        var createdEntityId = await _userRepo.InsertAsync<int>(userToCreate,  _queryProvider.CreateSingle);
+        var newUser = await _userRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId.ToString());
+
+        return newUser?.UserId ?? 0; // check this return value
     }
 }

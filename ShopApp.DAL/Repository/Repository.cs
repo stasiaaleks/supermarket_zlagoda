@@ -1,81 +1,104 @@
-using Npgsql;
-using System.Data;
+using System.Dynamic;
 using System.Reflection;
+using Dapper;
 using ShopApp.DAL.DbConnection;
+using ShopApp.DAL.Queries;
 
 namespace ShopApp.DAL.Repository;
-
-
 public interface IRepository<T> where T : class
 {
-    Task<IEnumerable<T>> QueryListAsync(string sql, object? parameters = null);
-    Task<T?> ExecuteAsync(string sql, object? parameters = null);
-    Task<T?> QuerySingleAsync(string sql, object? parameters = null);
+    Task<T?> GetByIdAsync(string queryPath, string id);
+    Task<T?> GetSingleAsync(string queryPath, object? parameters = null);
+    Task<IEnumerable<T>> GetAllAsync(string queryPath);
+    Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null);
+    Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
+    Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null);
+    Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null);
 }
 
-public abstract class Repository<T>: IRepository<T> where T : class
+public class Repository<T> : IRepository<T> where T : class
 {
     private readonly IConnectionProvider _dbConnectionProvider;
+    private readonly IReadonlyRegistry _sqlQueryRegistry;
 
-    protected Repository(IConnectionProvider dbConnectionProvider)
+    public Repository(IConnectionProvider dbConnectionProvider, IReadonlyRegistry sqlQueryRegistry)
     {
         _dbConnectionProvider = dbConnectionProvider;
-    }
-
-    public async Task<IEnumerable<T>> QueryListAsync(string sql, object? parameters = null)
-    {
-        var results = await QueryAsync(sql, parameters);
-        return results;
-    }
-
-    public async Task<T?> ExecuteAsync(string sql, object? parameters = null)
-    {
-        using var connection = await _dbConnectionProvider.Connect();
-        await using var command = new NpgsqlCommand(sql, (NpgsqlConnection)connection);
-
-        if (parameters != null)
-            command.Parameters.AddRange(ToNpgsqlParameters(parameters));
-
-        var result = await command.ExecuteScalarAsync();
-        if (result == DBNull.Value) return default(T);
-        return (T?)result;
+        _sqlQueryRegistry = sqlQueryRegistry;
     }
     
-    public async Task<T?> QuerySingleAsync(string sql, object? parameters = null)
+    public async Task<T?> GetByIdAsync(string queryPath, string id)
     {
-        var results = await QueryAsync(sql, parameters);
-        return results[0];
-    }
-
-    protected abstract T Map(IDataRecord record);
-    
-    // protected abstract object Map(T entity);
-
-    private NpgsqlParameter[] ToNpgsqlParameters(object obj)
-    {
-        return obj.GetType()
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Select(p => new NpgsqlParameter("@" + p.Name, p.GetValue(obj) ?? DBNull.Value))
-            .ToArray();
-    }
-
-    private async Task<IList<T>> QueryAsync(string sql, object? parameters = null)
-    {
-        var results = new List<T>();
-
         using var connection = await _dbConnectionProvider.Connect();
-        await using var command = new NpgsqlCommand(sql, (NpgsqlConnection)connection);
+        var query = _sqlQueryRegistry.Load(queryPath); 
+        return await connection.QuerySingleOrDefaultAsync<T>(query, new { Id = id });
+    }
 
+    public async Task<IEnumerable<T>> GetAllAsync(string queryPath)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath); 
+        return await connection.QueryAsync<T>(query);
+    }
+
+    public async Task<T?> GetSingleAsync(string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath); 
+        return await connection.QuerySingleOrDefaultAsync<T>(query, parameters);
+    }
+    
+    public async Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath);
+        
+        var totalQueryParameters = MergeEntityParameters(parameters, entity);
+        return await connection.ExecuteScalarAsync<TResult>(query, totalQueryParameters);
+    }
+
+    public async Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath);
+
+        var totalQueryParameters = MergeEntityParameters(parameters, entity);
+        return await connection.ExecuteScalarAsync<TResult>(query, totalQueryParameters);
+    }
+
+    public async Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath);
+
+        var totalQueryParameters = MergeEntityParameters(parameters, entity);
+        return await connection.ExecuteAsync(query, totalQueryParameters);
+    }
+
+    public async Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath);
+        return await connection.ExecuteScalarAsync<TResult>(query, parameters);
+    }
+    
+    private object MergeEntityParameters(object? parameters, T entity)
+    {
+        var resultObj = new ExpandoObject() as IDictionary<string, object?>;
         if (parameters != null)
-            command.Parameters.AddRange(ToNpgsqlParameters(parameters));
-
-        await using var reader = await command.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
         {
-            results.Add(Map(reader));
+            foreach (var prop in parameters.GetType().GetProperties())
+            {
+                resultObj[prop.Name] = prop.GetValue(parameters);
+            }
+        }
+        
+        foreach (var prop in typeof(T).GetProperties())
+        {
+            var value = prop.GetValue(entity);
+            resultObj.TryAdd(prop.Name, value);
         }
 
-        return results;
+        return resultObj;
     }
 }

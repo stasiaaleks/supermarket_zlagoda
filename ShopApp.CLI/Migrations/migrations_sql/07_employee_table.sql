@@ -1,9 +1,9 @@
 ﻿CREATE TABLE IF NOT EXISTS employee (
     id_employee VARCHAR(10) PRIMARY KEY,
-    empl_surname VARCHAR(50) NOT NULL,
-    empl_name VARCHAR(50) NOT NULL,
-    empl_patronymic VARCHAR(50) NOT NULL,
-    empl_role VARCHAR(10) NOT NULL,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    patronymic VARCHAR(50) NOT NULL,
+    role VARCHAR(10) NOT NULL,
     salary DECIMAL(13,4) NOT NULL,
     date_of_birth DATE NOT NULL,
     date_of_start DATE NOT NULL,

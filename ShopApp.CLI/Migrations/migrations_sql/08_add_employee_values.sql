@@ -1,6 +1,6 @@
 ﻿INSERT INTO employee (
-    id_employee, empl_surname, empl_name, empl_patronymic,
-    empl_role, salary, date_of_birth, date_of_start,
+    id_employee, surname, name, patronymic,
+    role, salary, date_of_birth, date_of_start,
     phone_number, city, street, zip_code
 ) VALUES
       ('E001', 'Ivanov', 'Ivan', 'Ivanovych', 'manager', 20000.00, '1990-05-15', '2020-01-01', '+380931234567', 'Kyiv', 'Khreshchatyk 1', '01001'),

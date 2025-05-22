@@ -11,13 +11,24 @@ string connectionString = builder.Configuration.GetConnectionString("DevDBConnec
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => { options.LoginPath = "/login"; });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocal", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5112", "http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddSingleton(connectionString);
 builder.Services.AddDataServices();
 builder.Services.AddBusinessLogicServices();
 builder.Services.AddQueryProviders();
-builder.Services.AddEntityRepositories();
 
 // 3rd-party dependencies setup
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -28,11 +39,12 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
+app.UseCors("AllowLocal");
 app.UseRouting();
-app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+app.MapControllers();
 
 if (app.Environment.IsDevelopment())
 {

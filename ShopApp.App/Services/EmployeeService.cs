@@ -1,10 +1,8 @@
 using AutoMapper;
-using ShopApp.DAL.Queries;
 using ShopApp.DAL.Repository;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
 using ShopApp.Data.QueriesAccess;
-using ShopApp.Repositories;
 
 namespace ShopApp.Services;
 
@@ -18,15 +16,13 @@ public interface IEmployeeService
 
 public class EmployeeService: IEmployeeService
 {
-    private readonly IEmployeeRepository _employeeRepo;
-    private readonly IReadonlyRegistry _sqlQueryRegistry;
+    private readonly IRepository<Employee> _employeeRepo;
     private readonly EmployeeQueryProvider _queryProvider;
     private readonly IMapper _mapper;
     
-    public EmployeeService(IEmployeeRepository employeeRepo, IReadonlyRegistry sqlQueryRegistry, EmployeeQueryProvider queryProvider, IMapper mapper)
+    public EmployeeService(IRepository<Employee> employeeRepo, EmployeeQueryProvider queryProvider, IMapper mapper)
     {
         _employeeRepo = employeeRepo;
-        _sqlQueryRegistry = sqlQueryRegistry;
         _queryProvider = queryProvider;
         _mapper = mapper;
     }
@@ -55,9 +51,10 @@ public class EmployeeService: IEmployeeService
     
     public async Task<string> CreateEmployee(EmployeeDto dto)
     {
-        var query = _queryProvider.CreateSingle;
         var employeeToCreate = _mapper.Map<Employee>(dto);
-        var createdEntity = await _employeeRepo.CreateAsync(employeeToCreate, query);
-        return createdEntity.IdEmployee;
+        var createdEntityId = await _employeeRepo.InsertAsync<string>(employeeToCreate, _queryProvider.CreateSingle);
+        var newEmployee = await _employeeRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId);
+        
+        return newEmployee?.IdEmployee ?? null; // check this return value
     }
 } 

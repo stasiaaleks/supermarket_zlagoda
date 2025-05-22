@@ -11,7 +11,7 @@ public static class DataServiceCollectionExtension
     {
         services.AddScoped<IConnectionProvider, DbConnectionProvider>(); 
         services.AddScoped<IReadonlyRegistry, SqlQueryRegistry>(); 
-        services.AddScoped(typeof(IDapperRepository<>), typeof(DapperRepository<>));
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         return services;
     }
 }
