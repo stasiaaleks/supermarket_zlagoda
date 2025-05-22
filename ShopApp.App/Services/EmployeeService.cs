@@ -52,9 +52,18 @@ public class EmployeeService: IEmployeeService
     public async Task<string> CreateEmployee(EmployeeDto dto)
     {
         var employeeToCreate = _mapper.Map<Employee>(dto);
+        employeeToCreate.IdEmployee = await GetNextEmployeeId();
         var createdEntityId = await _employeeRepo.InsertAsync<string>(employeeToCreate, _queryProvider.CreateSingle);
         var newEmployee = await _employeeRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId);
+
+        if (newEmployee == null) throw new NullReferenceException($"Failed to create an employee {dto.Name} {dto.Surname}");
         
-        return newEmployee?.IdEmployee ?? null; // check this return value
+        return newEmployee.IdEmployee;
+    }
+
+    private async Task<string> GetNextEmployeeId()
+    {
+        var nextval = await _employeeRepo.ExecuteScalarAsync<string>(_queryProvider.GetSeqNextVal);
+        return $"E{nextval}";
     }
 } 

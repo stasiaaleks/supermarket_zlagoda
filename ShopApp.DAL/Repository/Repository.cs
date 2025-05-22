@@ -30,8 +30,15 @@ public class Repository<T> : IRepository<T> where T : class
     public async Task<T?> GetByIdAsync(string queryPath, string id)
     {
         using var connection = await _dbConnectionProvider.Connect();
-        var query = _sqlQueryRegistry.Load(queryPath); 
-        return await connection.QuerySingleOrDefaultAsync<T>(query, new { Id = id });
+        var query = _sqlQueryRegistry.Load(queryPath);
+        
+        object param;
+        if (int.TryParse(id, out var intId))
+            param = intId;
+        else
+            param = id;
+        
+        return await connection.QuerySingleOrDefaultAsync<T>(query, new { Id = param });
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(string queryPath)

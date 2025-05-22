@@ -1,0 +1,1 @@
+SELECT NEXTVAL('public.employee_id_employee_seq');

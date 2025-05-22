@@ -45,9 +45,10 @@ public class UserService: IUserService
             Username = username
         };
    
-        var createdEntityId = await _userRepo.InsertAsync<int>(userToCreate,  _queryProvider.CreateSingle);
-        var newUser = await _userRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId.ToString());
+        var createdEntityId = await _userRepo.InsertAsync<string>(userToCreate,  _queryProvider.CreateSingle);
+        var newUser = await _userRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId);
+        if (newUser == null) throw new NullReferenceException($"Failed to create an employee {username}");
 
-        return newUser?.UserId ?? 0; // check this return value
+        return newUser.UserId;
     }
 }
