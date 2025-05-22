@@ -14,6 +14,7 @@ public interface IRepository<T> where T : class
     Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null);
     Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null);
+    Task<string> GetNextPrefixedStringId(string prefix, string sequenceQueryPath);
 }
 
 public class Repository<T> : IRepository<T> where T : class
@@ -87,6 +88,12 @@ public class Repository<T> : IRepository<T> where T : class
         using var connection = await _dbConnectionProvider.Connect();
         var query = _sqlQueryRegistry.Load(queryPath);
         return await connection.ExecuteScalarAsync<TResult>(query, parameters);
+    }
+    
+    public async Task<string> GetNextPrefixedStringId(string prefix, string sequenceQueryPath)
+    {
+        var nextval = await ExecuteScalarAsync<string>(sequenceQueryPath);
+        return $"{prefix}{nextval}";
     }
     
     private object MergeEntityParameters(object? parameters, T entity)
