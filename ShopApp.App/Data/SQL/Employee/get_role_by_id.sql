@@ -1,1 +1,1 @@
-SELECT empl_role FROM employee where id_employee=@Id;
+SELECT role FROM employee where id_employee=@Id;

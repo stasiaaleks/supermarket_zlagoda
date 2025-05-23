@@ -1,1 +1,1 @@
-SELECT * from product where id_product=@Id;
+SELECT * FROM product WHERE id_product=@Id;

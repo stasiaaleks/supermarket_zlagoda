@@ -1,0 +1,1 @@
+﻿DELETE FROM product WHERE id_product=@Id;

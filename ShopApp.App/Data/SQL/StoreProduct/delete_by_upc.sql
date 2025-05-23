@@ -1,0 +1,1 @@
+﻿DELETE FROM store_product WHERE upc = @UPC;

@@ -1,4 +1,5 @@
-namespace ShopApp.Data.Entities; public interface ICategory
+namespace ShopApp.Data.Entities;
+public interface ICategory
 {
     int CategoryNumber { get; set; }
     string CategoryName { get; set; }
