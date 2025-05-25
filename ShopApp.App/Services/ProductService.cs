@@ -13,11 +13,11 @@ public interface IProductService
 
 public class ProductService : IProductService
 {
-    private readonly IRepository<Product> _productRepo;
+    private readonly IRepository<ProductDto> _productRepo;
     private readonly ProductQueryProvider _queryProvider;
     private readonly IMapper _mapper;
 
-    public ProductService(IRepository<Product> productRepo, ProductQueryProvider queryProvider, IMapper mapper)
+    public ProductService(IRepository<ProductDto> productRepo, ProductQueryProvider queryProvider, IMapper mapper)
     {
         _productRepo = productRepo;
         _queryProvider = queryProvider;

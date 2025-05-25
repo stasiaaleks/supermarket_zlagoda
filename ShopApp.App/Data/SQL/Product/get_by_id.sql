@@ -1,1 +1,4 @@
-SELECT * FROM product WHERE id_product=@Id;
+SELECT * 
+FROM product p
+INNER JOIN category c on c.category_number = p.category_number
+WHERE p.id_product=@Id;
