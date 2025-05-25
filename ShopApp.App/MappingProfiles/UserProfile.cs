@@ -1,7 +1,7 @@
 using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
 
-namespace ShopApp.Data.MappingProfiles;
+namespace ShopApp.MappingProfiles;
 
 using AutoMapper;
 
