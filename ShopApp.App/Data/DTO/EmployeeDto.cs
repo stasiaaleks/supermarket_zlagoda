@@ -17,7 +17,7 @@ public interface IEmployeeDto
     public string? ZipCode { get; set; }
 }
 
-public class EmployeeDto: IEmployeeDto
+public class EmployeeDto
 {
     public string? IdEmployee { get; set; }
     public string Surname { get; set; }

@@ -10,7 +10,7 @@ namespace ShopApp.Services;
 public interface IEmployeeService
 {
     Task<string> GetEmployeeRoleAsync(string id);
-    Task<Employee> GetEmployeeByUsernameAsync(string username); // change to DTO
+    Task<EmployeeDto> GetEmployeeByUsernameAsync(string username); // change to DTO
     Task<string> CreateEmployee(EmployeeDto dto);
 }
 
@@ -27,7 +27,7 @@ public class EmployeeService: IEmployeeService
         _mapper = mapper;
     }
     
-    public async Task<Employee> GetEmployeeByUsernameAsync(string username)
+    public async Task<EmployeeDto> GetEmployeeByUsernameAsync(string username)
     {
         var query = _queryProvider.GetByUsername; 
         var employee = await _employeeRepo.GetSingleAsync(query, new { Username = username }); 
@@ -35,7 +35,7 @@ public class EmployeeService: IEmployeeService
         if (employee == null)
             throw new NullReferenceException($"Employee with username '{username}' not found.");
 
-        return employee;
+        return _mapper.Map<EmployeeDto>(employee);
     }
 
     public async Task<string> GetEmployeeRoleAsync(string id)
