@@ -12,6 +12,7 @@ public class EmployeeQueryProvider: IQueryByNamespaceProvider
     private const string GetAllCashiersSortedBySurnameQuery = "get_cashiers_sorted";
     
     private const string CreateSingleQuery = "create_single";
+    private const string UpdateByIdQuery = "update_by_id";
     private const string DeleteByIdQuery = "delete_by_id";
     
     public string GetById => GetNamespace(GetByIdQuery);
@@ -19,9 +20,11 @@ public class EmployeeQueryProvider: IQueryByNamespaceProvider
     public string GetRoleById => GetNamespace(GetRoleByIdQuery);
     public string GetAllSortedBySurname => GetNamespace(GetAllSortedBySurnameQuery);
     public string GetAllCashiersSortedBySurname => GetNamespace(GetAllCashiersSortedBySurnameQuery);
-    public string CreateSingle => GetNamespace(CreateSingleQuery);
     public string GetSeqNextVal => GetNamespace(GetSeqNextValQuery);
+    
+    public string CreateSingle => GetNamespace(CreateSingleQuery);
     public string DeleteById => GetNamespace(DeleteByIdQuery);
+    public string UpdateById => GetNamespace(UpdateByIdQuery);
     
     public string GetNamespace(string fileName)
     {

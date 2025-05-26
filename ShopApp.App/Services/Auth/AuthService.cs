@@ -39,7 +39,7 @@ public class AuthService: IAuthService
 
     public async Task<User> Register(RegisterDto dto)
     {
-        var employeeDto = _mapper.Map<EmployeeDto>(dto);
+        var employeeDto = _mapper.Map<CreateEmployeeDto>(dto);
         var newEmployeeId = await _employeeService.CreateEmployee(employeeDto);
         var newUserId = await _userService.CreateUser(dto.Username, dto.Password, newEmployeeId);
         return await _userService.GetById(newUserId);

@@ -32,7 +32,7 @@ public class OnlySelfAttribute : Attribute, IAsyncAuthorizationFilter
         var routeData = context.RouteData.Values;
         var targetId = routeData[_paramName]?.ToString();
 
-        // If user's role is NOT in the restricted list, allow
+        // if user's role is NOT in the restricted list, allow
         var role = user.FindFirst(ClaimTypes.Role)?.Value;
         if (role == null || !_roles.Contains(role, StringComparer.OrdinalIgnoreCase))
         {

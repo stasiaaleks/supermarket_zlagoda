@@ -1,5 +1,4 @@
 using System.Dynamic;
-using System.Reflection;
 using Dapper;
 using ShopApp.DAL.DbConnection;
 using ShopApp.DAL.Queries;
@@ -13,6 +12,7 @@ public interface IRepository<T> where T : class
     Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null);
+    Task<int> DeleteByIdAsync(string queryPath, string id);
     Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null);
     Task<string> GetNextPrefixedStringId(string prefix, string sequenceQueryPath);
 }
@@ -81,6 +81,14 @@ public class Repository<T> : IRepository<T> where T : class
 
         var totalQueryParameters = MergeEntityParameters(parameters, entity);
         return await connection.ExecuteAsync(query, totalQueryParameters);
+    }
+
+    public async Task<int> DeleteByIdAsync(string queryPath, string id)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath);
+        
+        return await connection.ExecuteAsync(query, new { Id = id });
     }
 
     public async Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null)

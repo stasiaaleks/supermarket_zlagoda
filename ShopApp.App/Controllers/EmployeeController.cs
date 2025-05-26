@@ -51,10 +51,32 @@ public class EmployeeController : ControllerBase
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] EmployeeDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateEmployeeDto dto)
     {
-        var createdEntityId = await _employeeService.CreateEmployee(dto);
-        if (createdEntityId == null) return BadRequest();
+        var id = await _employeeService.CreateEmployee(dto);
+        if (id == null) return BadRequest();
         return Created();
+    }
+    
+    [HttpPut]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
+    [OnlySelf(nameof(dto.IdEmployee), EmployeeRoles.Cashier)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Update([FromBody] EmployeeDto dto)
+    {
+        var id = await _employeeService.UpdateEmployee(dto);
+        if (id == null) return BadRequest();
+        return NoContent();
+    }
+    
+    [HttpDelete("{id}")]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
+    [OnlySelf(nameof(id), EmployeeRoles.Cashier)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete([FromRoute] string id)
+    {
+        var deleted = await _employeeService.DeleteEmployee(id);
+        if (!deleted) return BadRequest();
+        return NoContent();
     }
 }

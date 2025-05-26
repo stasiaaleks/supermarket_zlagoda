@@ -14,7 +14,9 @@ public interface IEmployeeService
     Task<string> GetEmployeeRole(string id);
     Task<EmployeeDto> GetById(string id);
     Task<EmployeeDto> GetByUsername(string username);
-    Task<string> CreateEmployee(EmployeeDto dto);
+    Task<string> CreateEmployee(CreateEmployeeDto dto);
+    Task<string> UpdateEmployee(EmployeeDto dto);
+    Task<bool> DeleteEmployee(string id);
 }
 
 public class EmployeeService: IEmployeeService
@@ -79,7 +81,7 @@ public class EmployeeService: IEmployeeService
         return employee.Role;
     }
     
-    public async Task<string> CreateEmployee(EmployeeDto dto)
+    public async Task<string> CreateEmployee(CreateEmployeeDto dto)
     {
         var employeeToCreate = _mapper.Map<Employee>(dto);
         employeeToCreate.IdEmployee = await _employeeRepo.GetNextPrefixedStringId("E", _queryProvider.GetSeqNextVal);
@@ -89,5 +91,18 @@ public class EmployeeService: IEmployeeService
         if (newEmployee == null) throw new NullReferenceException($"Failed to create an employee {dto.Name} {dto.Surname}");
         
         return newEmployee.IdEmployee;
+    }
+
+    public async Task<string> UpdateEmployee(EmployeeDto dto)
+    {
+        var employeeToUpdate = _mapper.Map<Employee>(dto);
+        var updatedEntityId = await _employeeRepo.UpdateAsync<string>(employeeToUpdate, _queryProvider.UpdateById);
+        return updatedEntityId;
+    }
+
+    public async Task<bool> DeleteEmployee(string id)
+    {
+        var affectedRows = await _employeeRepo.DeleteByIdAsync(_queryProvider.DeleteById, id);
+        return affectedRows > 0;
     }
 } 

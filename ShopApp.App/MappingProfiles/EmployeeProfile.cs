@@ -10,6 +10,7 @@ public class EmployeeProfile : Profile
     public EmployeeProfile()
     {
         CreateMap<EmployeeDto, Employee>();
+        CreateMap<CreateEmployeeDto, Employee>();
         CreateMap<Employee, EmployeeDto>();
         CreateMap<RegisterDto, EmployeeDto>();
     }
