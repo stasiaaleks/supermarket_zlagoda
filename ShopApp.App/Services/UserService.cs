@@ -8,6 +8,7 @@ namespace ShopApp.Services;
 
 public interface IUserService
 {
+    Task<User> GetById(int id);
     Task<User> GetByUsername(string username);
     Task<int> CreateUser(string username, string password, string idEmployee);
 }
@@ -23,6 +24,15 @@ public class UserService: IUserService
         _userRepo = userRepo;
         _queryProvider = queryProvider;
         _passwordHasher = passwordHasher;
+    }
+
+    public async Task<User> GetById(int id)
+    {
+        var user = await _userRepo.GetByIdAsync(_queryProvider.GetById, id.ToString()); 
+        if (user == null)
+            throw new KeyNotFoundException($"User with id '{id}' not found.");
+
+        return user;
     }
 
     public async Task<User> GetByUsername(string username)

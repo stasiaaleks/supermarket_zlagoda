@@ -42,7 +42,6 @@ public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
         if (service != null && !await IsUserAuthorized(service, username))
         {
             context.Result = new ForbidResult();
-            return;
         }
     }
     
@@ -65,10 +64,10 @@ public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
 
     private async Task<bool> IsUserAuthorized(IEmployeeService employeeService, string username)
     {
-        var employee = await employeeService.GetEmployeeByUsernameAsync(username);
+        var employee = await employeeService.GetByUsername(username);
         if (employee == null) return false;
 
-        var role = await employeeService.GetEmployeeRoleAsync(employee.IdEmployee);
+        var role = await employeeService.GetEmployeeRole(employee.IdEmployee);
         return _allowedRoles.Contains(role, StringComparer.OrdinalIgnoreCase);
     }
 }

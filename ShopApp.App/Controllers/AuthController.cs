@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using ShopApp.Data.DTO;
+using ShopApp.Data.Entities;
+using ShopApp.Services;
 using ShopApp.Services.Auth;
 
 namespace ShopApp.Controllers;
@@ -11,10 +13,12 @@ namespace ShopApp.Controllers;
 public class AuthController: ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IEmployeeService _employeeService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IEmployeeService employeeService)
     {
         _authService = authService;
+        _employeeService = employeeService;
     }
     
     [HttpPost("login")]
@@ -23,17 +27,17 @@ public class AuthController: ControllerBase
         var user = await _authService.Authenticate(loginDto.Username, loginDto.Password);
         if (user == null) return Unauthorized();
 
-        await LoginUser(loginDto);
+        await LoginUser(user);
         return Ok();
     }
     
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
-        var createdEntities = await _authService.Register(dto);
-        if (!createdEntities) return BadRequest();
+        var createdUser = await _authService.Register(dto);
+        if (createdUser == null) return BadRequest();
         
-        await LoginUser(dto); 
+        await LoginUser(createdUser); 
         return Ok();
     }
     
@@ -45,11 +49,16 @@ public class AuthController: ControllerBase
     }
 
 
-    private async Task LoginUser(ILoginDto dto)
+    private async Task LoginUser(IUser user)
     {
+        var relatedEmployee = await _employeeService.GetById(user.IdEmployee);
+        
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, dto.Username), // sets user.Identity.Name
+            new Claim(ClaimTypes.Name, user.Username), // sets user.Identity.Name
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),  
+            new Claim(ClaimTypes.Role, relatedEmployee.Role),
+            new Claim("EmployeeId", relatedEmployee.IdEmployee),      
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
