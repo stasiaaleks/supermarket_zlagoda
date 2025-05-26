@@ -27,7 +27,7 @@ public class CheckController : ControllerBase
     }
     
     [HttpGet("with-sales")]
-    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
+    [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(IEnumerable<CheckWithSalesListDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCheckById([FromQuery] DateTime start, [FromQuery] DateTime end)
     {
