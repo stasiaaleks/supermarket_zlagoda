@@ -3,6 +3,8 @@
     c.id_employee,
     c.card_number,
     c.print_date,
+    c.vat,
+    c.sum_total,
     s.upc,
     s.product_number,
     s.selling_price,

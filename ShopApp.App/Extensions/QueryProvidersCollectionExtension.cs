@@ -11,6 +11,7 @@ public static class QueryProvidersCollectionExtension
         services.AddScoped<EmployeeQueryProvider>();
         services.AddScoped<CategoryQueryProvider>();
         services.AddScoped<UserQueryProvider>();
+        services.AddScoped<CheckQueryProvider>();
         
         return services;
     }

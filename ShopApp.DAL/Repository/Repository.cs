@@ -8,7 +8,7 @@ public interface IRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(string queryPath, string id);
     Task<T?> GetSingleAsync(string queryPath, object? parameters = null);
-    Task<IEnumerable<T>> GetAllAsync(string queryPath);
+    Task<IEnumerable<T>> GetAllAsync(string queryPath, object? parameters = null);
     Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null);
@@ -42,11 +42,11 @@ public class Repository<T> : IRepository<T> where T : class
         return await connection.QuerySingleOrDefaultAsync<T>(query, new { Id = param });
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(string queryPath)
+    public async Task<IEnumerable<T>> GetAllAsync(string queryPath, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();
         var query = _sqlQueryRegistry.Load(queryPath); 
-        return await connection.QueryAsync<T>(query);
+        return await connection.QueryAsync<T>(query, parameters);
     }
 
     public async Task<T?> GetSingleAsync(string queryPath, object? parameters = null)
