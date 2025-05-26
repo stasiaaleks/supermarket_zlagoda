@@ -9,8 +9,11 @@ namespace ShopApp.Services;
 
 public interface IEmployeeService
 {
-    Task<string> GetEmployeeRoleAsync(string id);
-    Task<EmployeeDto> GetEmployeeByUsernameAsync(string username); // change to DTO
+    Task<IEnumerable<EmployeeDto>> GetAll();
+    Task<IEnumerable<EmployeeDto>> GetAllCashiers();
+    Task<string> GetEmployeeRole(string id);
+    Task<EmployeeDto> GetById(string id);
+    Task<EmployeeDto> GetByUsername(string username);
     Task<string> CreateEmployee(EmployeeDto dto);
 }
 
@@ -27,7 +30,34 @@ public class EmployeeService: IEmployeeService
         _mapper = mapper;
     }
     
-    public async Task<EmployeeDto> GetEmployeeByUsernameAsync(string username)
+    public async Task<IEnumerable<EmployeeDto>> GetAll()
+    {
+        var query = _queryProvider.GetAllSortedBySurname; 
+        var employees = await _employeeRepo.GetAllAsync(query);
+
+        return _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+    }
+
+    public async Task<IEnumerable<EmployeeDto>> GetAllCashiers()
+    {
+        var query = _queryProvider.GetAllCashiersSortedBySurname; 
+        var employees = await _employeeRepo.GetAllAsync(query);
+
+        return _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+    }
+
+    public async Task<EmployeeDto> GetById(string id)
+    {
+        var query = _queryProvider.GetById; 
+        var employee = await _employeeRepo.GetByIdAsync(query,id); 
+        
+        if (employee == null)
+            throw new NullReferenceException($"Employee with id '{id}' not found.");
+
+        return _mapper.Map<EmployeeDto>(employee);
+    }
+    
+    public async Task<EmployeeDto> GetByUsername(string username)
     {
         var query = _queryProvider.GetByUsername; 
         var employee = await _employeeRepo.GetSingleAsync(query, new { Username = username }); 
@@ -38,7 +68,7 @@ public class EmployeeService: IEmployeeService
         return _mapper.Map<EmployeeDto>(employee);
     }
 
-    public async Task<string> GetEmployeeRoleAsync(string id)
+    public async Task<string> GetEmployeeRole(string id)
     {
         var query = _queryProvider.GetById; 
         var employee = await _employeeRepo.GetByIdAsync(query, id);

@@ -31,9 +31,11 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetProductById([FromQuery] string id)
+    public async Task<IActionResult> GetProductById([FromRoute] string id)
     {
         var products = await _productService.GetById(id);
         return Ok(products);
     }
+    
+    
 }
