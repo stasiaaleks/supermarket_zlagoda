@@ -18,19 +18,24 @@ public interface IEmployeeService
     Task<string> CreateEmployee(CreateEmployeeDto dto);
     Task<string> UpdateEmployee(EmployeeDto dto);
     Task<bool> DeleteEmployee(string id);
+    Task<PersonalEmployeeInfoDto> GetAllPersonalInfo(string id);
 }
 
 public class EmployeeService: IEmployeeService
 {
     private readonly IRepository<Employee> _employeeRepo;
+    private readonly IUserService _userService;
+    private readonly ICheckService _checkService;
     private readonly EmployeeQueryProvider _queryProvider;
     private readonly IMapper _mapper;
     
-    public EmployeeService(IRepository<Employee> employeeRepo, EmployeeQueryProvider queryProvider, IMapper mapper)
+    public EmployeeService(IRepository<Employee> employeeRepo, EmployeeQueryProvider queryProvider, IMapper mapper, IUserService userService, ICheckService checkService)
     {
         _employeeRepo = employeeRepo;
         _queryProvider = queryProvider;
         _mapper = mapper;
+        _userService = userService;
+        _checkService = checkService;
     }
     
     public async Task<IEnumerable<EmployeeDto>> GetAll()
@@ -116,5 +121,21 @@ public class EmployeeService: IEmployeeService
     {
         var affectedRows = await _employeeRepo.DeleteByIdAsync(_queryProvider.DeleteById, id);
         return affectedRows > 0;
+    }
+
+    public async Task<PersonalEmployeeInfoDto> GetAllPersonalInfo(string id)
+    {
+        var employee = await _employeeRepo.GetByIdAsync(_queryProvider.GetById, id);
+        var user = await _userService.GetByEmployeeId(id);
+        var checks = await _checkService.GetAllWithSalesByPeriodAndCashier(employee.DateOfStart, DateTime.Today, id);
+        return MapToPersonalInfoDto(employee, user.Username, checks);
+    }
+    
+    private PersonalEmployeeInfoDto MapToPersonalInfoDto(Employee employee, string username, IEnumerable<CheckWithSalesListDto> checks)
+    {
+        var dto = _mapper.Map<PersonalEmployeeInfoDto>(employee);
+        dto.Username = username;
+        dto.Checks = checks.ToList();
+        return dto;
     }
 } 

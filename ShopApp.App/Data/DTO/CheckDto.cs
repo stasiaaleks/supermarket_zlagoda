@@ -43,7 +43,7 @@ public class CheckWithSalesListDto: ICheckDto
     public DateTime PrintDate { get; set; }
     public decimal SumTotal { get; set; }
     public decimal VAT { get; set; }
-    public List<SaleDto> Sales { get; set; } = new();
+    public List<SaleDto> Sales { get; set; } = [];
 }
 
 public class CheckSumDto

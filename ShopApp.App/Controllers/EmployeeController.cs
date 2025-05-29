@@ -50,11 +50,21 @@ public class EmployeeController : ControllerBase
     
     [HttpGet("contacts")]
     [VerifyRole(EmployeeRoles.Manager)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(EmployeeContactsDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployeeContacts([FromQuery] string surname)
     {
         var contactsDto = await _employeeService.GetContactsBySurname(surname);
         return Ok(contactsDto);
+    }
+
+    [HttpGet("{id}/personal-info/all")]
+    [VerifyRole(EmployeeRoles.Cashier)]
+    [OnlySelf(nameof(id), EmployeeRoles.Cashier)]
+    [ProducesResponseType(typeof(PersonalEmployeeInfoDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllPersonalInfo([FromRoute] string id)
+    {
+        var info = await _employeeService.GetAllPersonalInfo(id);
+        return Ok(info);
     }
     
     [HttpPost]

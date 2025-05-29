@@ -13,6 +13,9 @@ public class EmployeeProfile : Profile
         CreateMap<CreateEmployeeDto, Employee>();
         CreateMap<Employee, EmployeeDto>();
         CreateMap<RegisterDto, EmployeeDto>();
+        CreateMap<RegisterDto, CreateEmployeeDto>();
+        CreateMap<CreateEmployeeDto, RegisterDto>();
         CreateMap<Employee, EmployeeContactsDto>();
+        CreateMap<Employee, PersonalEmployeeInfoDto>();
     }
 }

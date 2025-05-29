@@ -12,8 +12,7 @@ public class LoginDto : ILoginDto
     public string Password { get; set; }
 }
 
-
-public class RegisterDto: ILoginDto, IEmployeeDto
+public class RegisterDto: IEmployeeDto, ILoginDto
 {
     public string Username { get; set; }
     public string Password { get; set; }

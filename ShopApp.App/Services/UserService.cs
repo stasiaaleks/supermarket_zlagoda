@@ -10,6 +10,7 @@ public interface IUserService
 {
     Task<User> GetById(int id);
     Task<User> GetByUsername(string username);
+    Task<User> GetByEmployeeId(string employeeId);
     Task<int> CreateUser(string username, string password, string idEmployee);
 }
 
@@ -40,6 +41,15 @@ public class UserService: IUserService
         var user = await _userRepo.GetSingleAsync(_queryProvider.GetByUsername, new { Username = username }); 
         if (user == null)
             throw new KeyNotFoundException($"User with username '{username}' not found.");
+
+        return user;
+    }
+
+    public async Task<User> GetByEmployeeId(string employeeId)
+    {
+        var user = await _userRepo.GetSingleAsync(_queryProvider.GetByEmployeeId, new { EmployeeId = employeeId }); 
+        if (user == null)
+            throw new KeyNotFoundException($"User with employee id '{employeeId}' not found.");
 
         return user;
     }

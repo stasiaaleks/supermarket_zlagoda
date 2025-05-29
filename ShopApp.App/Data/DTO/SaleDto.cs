@@ -23,5 +23,5 @@ public class CreateSaleDto : SaleDto
 
 public class ProductsSoldDto
 {
-    public int TotalSold { get; set; }
+    public int TotalSold { get; init; }
 }
