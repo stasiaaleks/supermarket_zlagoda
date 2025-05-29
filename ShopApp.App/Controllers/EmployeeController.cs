@@ -48,6 +48,15 @@ public class EmployeeController : ControllerBase
         return Ok(employee);
     }
     
+    [HttpGet("contacts")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeeContacts([FromQuery] string surname)
+    {
+        var contactsDto = await _employeeService.GetContactsBySurname(surname);
+        return Ok(contactsDto);
+    }
+    
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status201Created)]

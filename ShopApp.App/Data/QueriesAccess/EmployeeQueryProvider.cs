@@ -10,6 +10,7 @@ public class EmployeeQueryProvider: IQueryByNamespaceProvider
     private const string GetSeqNextValQuery = "get_seq_nextval";
     private const string GetAllSortedBySurnameQuery = "get_all_sorted_by_surname";
     private const string GetAllCashiersSortedBySurnameQuery = "get_cashiers_sorted";
+    private const string GetContactsBySurnameQuery = "get_contact_by_surname";
     
     private const string CreateSingleQuery = "create_single";
     private const string UpdateByIdQuery = "update_by_id";
@@ -20,6 +21,7 @@ public class EmployeeQueryProvider: IQueryByNamespaceProvider
     public string GetRoleById => GetNamespace(GetRoleByIdQuery);
     public string GetAllSortedBySurname => GetNamespace(GetAllSortedBySurnameQuery);
     public string GetAllCashiersSortedBySurname => GetNamespace(GetAllCashiersSortedBySurnameQuery);
+    public string GetContactsBySurname => GetNamespace(GetContactsBySurnameQuery);
     public string GetSeqNextVal => GetNamespace(GetSeqNextValQuery);
     
     public string CreateSingle => GetNamespace(CreateSingleQuery);

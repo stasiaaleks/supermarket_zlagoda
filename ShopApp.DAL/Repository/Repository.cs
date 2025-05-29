@@ -8,7 +8,9 @@ public interface IRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(string queryPath, string id);
     Task<T?> GetSingleAsync(string queryPath, object? parameters = null);
+    Task<TResult> GetSingleAsync<TResult>(string queryPath, object? parameters = null);
     Task<IEnumerable<T>> GetAllAsync(string queryPath, object? parameters = null);
+    Task<IEnumerable<TResult>> GetAllAsync<TResult>(string queryPath, object? parameters = null);
     Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null);
@@ -49,11 +51,25 @@ public class Repository<T> : IRepository<T> where T : class
         return await connection.QueryAsync<T>(query, parameters);
     }
 
+    public async Task<IEnumerable<TResult>> GetAllAsync<TResult>(string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath); 
+        return await connection.QueryAsync<TResult>(query, parameters);
+    }
+
     public async Task<T?> GetSingleAsync(string queryPath, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();
         var query = _sqlQueryRegistry.Load(queryPath); 
         return await connection.QuerySingleOrDefaultAsync<T>(query, parameters);
+    }
+    
+    public async Task<TResult> GetSingleAsync<TResult>(string queryPath, object? parameters = null)
+    {
+        using var connection = await _dbConnectionProvider.Connect();
+        var query = _sqlQueryRegistry.Load(queryPath); 
+        return await connection.QuerySingleOrDefaultAsync<TResult>(query, parameters);
     }
     
     public async Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null)

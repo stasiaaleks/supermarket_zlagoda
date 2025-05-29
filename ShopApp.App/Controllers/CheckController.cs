@@ -26,12 +26,21 @@ public class CheckController : ControllerBase
         return Ok(checks);
     }
     
-    [HttpGet("with-sales")]
+    [HttpGet("sales")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(IEnumerable<CheckWithSalesListDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCheckById([FromQuery] DateTime start, [FromQuery] DateTime end)
+    public async Task<IActionResult> GetChecksWithSales([FromQuery] DateTime start, [FromQuery] DateTime end)
     {
         var checks = await _checkService.GetAllWithSalesByPeriod(start, end);
+        return Ok(checks);
+    }
+    
+    [HttpGet("cashiers/{cashierId}/sales")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(IEnumerable<CheckWithSalesListDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetChecksWithSalesByCashier([FromQuery] DateTime start, [FromQuery] DateTime end, [FromRoute] string cashierId)
+    {
+        var checks = await _checkService.GetAllWithSalesByPeriodAndCashier(start, end, cashierId);
         return Ok(checks);
     }
     

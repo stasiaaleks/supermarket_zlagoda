@@ -1,5 +1,6 @@
 ﻿SELECT
     c.check_number,
+    c.id_employee,
     s.upc,
     p.product_name,
     s.product_number,
