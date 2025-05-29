@@ -20,3 +20,8 @@ public class SaleDto: ISaleDto
 public class CreateSaleDto : SaleDto
 {
 }
+
+public class ProductsSoldDto
+{
+    public int TotalSold { get; set; }
+}
