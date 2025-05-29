@@ -44,5 +44,23 @@ public class CheckController : ControllerBase
         return Ok(checks);
     }
     
+    [HttpGet("sum")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(CheckSumDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetChecksSumByPeriod([FromQuery] DateTime start, [FromQuery] DateTime end)
+    {
+        var sumDto = await _checkService.GetSumByPeriod(start, end);
+        return Ok(sumDto);
+    }
+    
+    [HttpGet("cashiers/{cashierId}/sum")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(CheckSumDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetChecksSumByPeriodAndCashier([FromQuery] DateTime start, [FromQuery] DateTime end, [FromRoute] string cashierId)
+    {
+        var sumDto = await _checkService.GetSumByEmployeeAndPeriod(start, end, cashierId);
+        return Ok(sumDto);
+    }
+    
     
 }

@@ -46,3 +46,8 @@ public class CheckWithSalesListDto: ICheckDto
     public List<SaleDto> Sales { get; set; } = new();
 }
 
+public class CheckSumDto
+{
+    public decimal TotalSum { get; set; }
+}
+
