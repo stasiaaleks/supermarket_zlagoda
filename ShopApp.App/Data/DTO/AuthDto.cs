@@ -16,7 +16,6 @@ public class RegisterDto: IEmployeeDto, ILoginDto
 {
     public string Username { get; set; }
     public string Password { get; set; }
-    public string? IdEmployee { get; set; }
     public string Surname { get; set; }
     public string Name { get; set; }
     public string Patronymic { get; set; }

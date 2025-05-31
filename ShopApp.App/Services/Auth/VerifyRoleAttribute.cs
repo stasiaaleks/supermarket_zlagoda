@@ -39,9 +39,12 @@ public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
             return;
         }
 
-        if (service != null && !await IsUserAuthorized(service, username))
+        if (service != null && !await UserHasPermissionByRole(service, username))
         {
-            context.Result = new ForbidResult();
+            context.Result = new JsonResult(new { error = "Method is forbidden for this role" })
+            {
+                StatusCode = StatusCodes.Status403Forbidden
+            };
         }
     }
     
@@ -62,7 +65,7 @@ public class VerifyRoleAttribute : Attribute, IAsyncAuthorizationFilter
         return employeeService != null;
     }
 
-    private async Task<bool> IsUserAuthorized(IEmployeeService employeeService, string username)
+    private async Task<bool> UserHasPermissionByRole(IEmployeeService employeeService, string username)
     {
         var employee = await employeeService.GetByUsername(username);
         if (employee == null) return false;
