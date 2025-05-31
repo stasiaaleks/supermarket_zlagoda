@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ShopApp.Data.DTO;
@@ -57,13 +58,20 @@ public class EmployeeController : ControllerBase
         return Ok(contactsDto);
     }
 
-    [HttpGet("{id}/personal-info/all")]
-    [VerifyRole(EmployeeRoles.Cashier)]
-    [OnlySelf(nameof(id), EmployeeRoles.Cashier)]
+    [HttpGet("me")]
+    [Authorize]
     [ProducesResponseType(typeof(PersonalEmployeeInfoDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllPersonalInfo([FromRoute] string id)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAllPersonalInfo()
     {
-        var info = await _employeeService.GetAllPersonalInfo(id);
+        var user = HttpContext.User;
+        var employeeId = user.Claims.FirstOrDefault(c => c.Type == "EmployeeId")?.Value;
+        if (user.Identity is not { IsAuthenticated: true } || string.IsNullOrEmpty(employeeId))
+        {
+            return Unauthorized();
+        }
+        
+        var info = await _employeeService.GetAllPersonalInfo(employeeId);
         return Ok(info);
     }
     
@@ -83,7 +91,7 @@ public class EmployeeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Update([FromBody] EmployeeDto dto)
     {
-        var id = await _employeeService.UpdateEmployee(dto);
+        var id = await _employeeService.UpdateEmployee(dto); 
         if (id == null) return BadRequest();
         return NoContent();
     }
