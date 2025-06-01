@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Enums;
+using ShopApp.Data.SearchCriteria;
 using ShopApp.Services;
 using ShopApp.Services.Auth;
 
@@ -29,11 +31,20 @@ public class ProductController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
+    [Authorize]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProductById([FromRoute] string id)
     {
         var products = await _productService.GetById(id);
+        return Ok(products);
+    }
+    
+    [HttpGet("filter")]
+    [VerifyRole(EmployeeRoles.Cashier)]
+    [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FilterProducts([FromQuery] ProductSearchCriteria searchCriteria)
+    {
+        var products = await _productService.Filter(searchCriteria);
         return Ok(products);
     }
     

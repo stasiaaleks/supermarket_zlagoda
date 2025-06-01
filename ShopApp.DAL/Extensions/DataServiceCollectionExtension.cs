@@ -10,7 +10,8 @@ public static class DataServiceCollectionExtension
     public static IServiceCollection AddDataServices(this IServiceCollection services)
     {
         services.AddScoped<IConnectionProvider, DbConnectionProvider>(); 
-        services.AddScoped<IReadonlyRegistry, SqlQueryRegistry>(); 
+        services.AddScoped<IReadonlyRegistry, SqlQueryRegistry>();
+        services.AddScoped<IQueryBuilder, SqlQueryBuilder>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         return services;
     }
