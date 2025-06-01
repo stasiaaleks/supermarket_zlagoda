@@ -40,7 +40,7 @@ public class ProductController : ControllerBase
     }
     
     [HttpGet("filter")]
-    [VerifyRole(EmployeeRoles.Cashier)]
+    [Authorize]
     [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FilterProducts([FromQuery] ProductSearchCriteria searchCriteria)
     {
