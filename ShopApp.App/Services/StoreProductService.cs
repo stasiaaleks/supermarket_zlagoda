@@ -2,6 +2,7 @@ using AutoMapper;
 using ShopApp.DAL.Repository;
 using ShopApp.Data.DTO;
 using ShopApp.Data.QueriesAccess;
+using ShopApp.Data.SearchCriteria;
 
 namespace ShopApp.Services;
 
@@ -10,6 +11,7 @@ public interface IStoreProductService
     Task<IEnumerable<StoreProductDto>> GetAll();
     Task<StoreProductPriceNumberDto> GetPriceAndNumberByUpc(string upc);
     Task<StoreProductDto> GetProductInfoByUpc(string upc);
+    Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria);
 }
 
 public class StoreProductService : IStoreProductService
@@ -41,5 +43,12 @@ public class StoreProductService : IStoreProductService
     {
         var product = await _productRepo.GetSingleAsync<StoreProductDto>(_queryProvider.GetProductInfoByUpc, new { UPC = upc });
         return product;
+    }
+    
+    public async Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria)
+    {
+        var query = _queryProvider.GetAll;
+        var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
+        return products;
     }
 }

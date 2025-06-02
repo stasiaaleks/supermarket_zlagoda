@@ -11,6 +11,7 @@ public interface IRepository<T> where T : class
     Task<TResult> GetSingleAsync<TResult>(string queryPath, object? parameters = null);
     Task<IEnumerable<T>> GetAllAsync(string queryPath, object? parameters = null);
     Task<IEnumerable<T>> FilterByPredicateAsync(string queryPath, ISearchCriteria criteria);
+    Task<IEnumerable<TResult>> FilterByPredicateAsync<TResult>(string queryPath, ISearchCriteria criteria);
     Task<IEnumerable<TResult>> GetAllAsync<TResult>(string queryPath, object? parameters = null);
     Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
@@ -63,6 +64,17 @@ public class Repository<T> : IRepository<T> where T : class
         
         using var connection = await _dbConnectionProvider.Connect();
         return await connection.QueryAsync<T>(finalQuery, predicate.Parameters);
+    }
+    
+    public async Task<IEnumerable<TResult>> FilterByPredicateAsync<TResult>(string queryPath, ISearchCriteria criteria)
+    {
+        var baseQuery = _sqlQueryRegistry.Load(queryPath);
+        var predicate = criteria.ToPredicate();
+        
+        var finalQuery = _queryBuilder.Build(baseQuery, criteria, predicate);
+        
+        using var connection = await _dbConnectionProvider.Connect();
+        return await connection.QueryAsync<TResult>(finalQuery, predicate.Parameters);
     }
 
     public async Task<IEnumerable<TResult>> GetAllAsync<TResult>(string queryPath, object? parameters = null)

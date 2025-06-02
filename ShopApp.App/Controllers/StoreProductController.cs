@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Enums;
+using ShopApp.Data.SearchCriteria;
 using ShopApp.Services;
 using ShopApp.Services.Auth;
 
@@ -45,5 +47,12 @@ public class StoreProductController : ControllerBase
         return Ok(dto);
     }
     
-    
+    [HttpGet("filter")]
+    [Authorize]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FilterProducts([FromQuery] StoreProductSearchCriteria searchCriteria)
+    {
+        var products = await _productService.Filter(searchCriteria);
+        return Ok(products);
+    }
 }
