@@ -1,8 +1,8 @@
 namespace ShopApp.Data.QueriesAccess;
 
-public class CategoryQueryProvider: IQueryByNamespaceProvider
+public class CustomerCardQueryProvider: IQueryByNamespaceProvider
 {
-    private const string FolderName = "Category";
+    private const string FolderName = "CustomerCard";
     private const string GetAllQuery = "get_all";
     private const string GetByIdQuery = "get_by_id";
 

@@ -10,6 +10,7 @@ public static class QueryProvidersCollectionExtension
         services.AddScoped<ProductQueryProvider>();
         services.AddScoped<EmployeeQueryProvider>();
         services.AddScoped<CategoryQueryProvider>();
+        services.AddScoped<CustomerCardQueryProvider>();
         services.AddScoped<UserQueryProvider>();
         services.AddScoped<CheckQueryProvider>();
         services.AddScoped<SaleQueryProvider>();

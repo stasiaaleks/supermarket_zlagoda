@@ -1,1 +1,1 @@
-﻿SELECT * FROM "check";
+﻿SELECT * FROM "check"
