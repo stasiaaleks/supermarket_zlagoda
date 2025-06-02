@@ -1,1 +1,1 @@
-﻿SELECT * FROM customer_card;
+﻿SELECT * FROM customer_card

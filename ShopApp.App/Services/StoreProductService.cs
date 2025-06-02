@@ -12,6 +12,8 @@ public interface IStoreProductService
     Task<StoreProductPriceNumberDto> GetPriceAndNumberByUpc(string upc);
     Task<StoreProductDto> GetProductInfoByUpc(string upc);
     Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria);
+    Task<IEnumerable<StoreProductDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria);
+    Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria);
 }
 
 public class StoreProductService : IStoreProductService
@@ -48,6 +50,22 @@ public class StoreProductService : IStoreProductService
     public async Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria)
     {
         var query = _queryProvider.GetAll;
+        var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
+        return products;
+    }
+
+    public async Task<IEnumerable<StoreProductDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria)
+    {
+        var query = _queryProvider.GetAllPromotional;
+        var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
+        return products;
+    }
+
+    // consider adding SortableCriteria or similar refactoring
+    // to make fetching of promotional/other products (and general filtering usage) cleaner
+    public async Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria)
+    {
+        var query = _queryProvider.GetAllRegular;
         var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
         return products;
     }

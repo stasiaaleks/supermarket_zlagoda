@@ -55,4 +55,22 @@ public class StoreProductController : ControllerBase
         var products = await _productService.Filter(searchCriteria);
         return Ok(products);
     }
+    
+    [HttpGet("promotional")]
+    [Authorize]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FilterPromotionalProducts([FromQuery] StoreProductSearchCriteria searchCriteria)
+    {
+        var products = await _productService.GetFilteredPromotional(searchCriteria);
+        return Ok(products);
+    }
+    
+    [HttpGet("regular")]
+    [Authorize]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FilterRegularProducts([FromQuery] StoreProductSearchCriteria searchCriteria)
+    {
+        var products = await _productService.GetFilteredRegular(searchCriteria);
+        return Ok(products);
+    }
 }
