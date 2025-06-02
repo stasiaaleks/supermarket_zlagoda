@@ -5,12 +5,14 @@ namespace ShopApp.Data.SearchCriteria;
 public class CustomerCardSearchCriteria : DAL.Queries.SearchCriteria
 {
     public string? PhoneNumber { get; set; }
+    public string? CustSurname { get; set; }
     public int? Percent { get; set; }
 
     public CustomerCardSearchCriteria() 
-        : base(defaultOrderByField: "percent",
+        : base(defaultOrderByField: "cust_surname",
             new Dictionary<string, string>
             {
+                { nameof(CustSurname), "cust_surname" },
                 { nameof(PhoneNumber), "phone_number" },
                 { nameof(Percent), "percent" }
             }
@@ -19,6 +21,7 @@ public class CustomerCardSearchCriteria : DAL.Queries.SearchCriteria
     
     public override IPredicate ToPredicate()
     {
+        // TODO: add clean search by surname
         var predicate = new SqlPredicate();
 
         if (!string.IsNullOrWhiteSpace(PhoneNumber))
