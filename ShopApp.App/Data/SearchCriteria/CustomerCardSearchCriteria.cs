@@ -21,7 +21,7 @@ public class CustomerCardSearchCriteria : DAL.Queries.SearchCriteria
     
     public override IPredicate ToPredicate()
     {
-        // TODO: add clean search by surname
+        // TODO: rename to Surname, refactor parameters addition to predicate
         var predicate = new SqlPredicate();
 
         if (!string.IsNullOrWhiteSpace(PhoneNumber))
@@ -30,6 +30,15 @@ public class CustomerCardSearchCriteria : DAL.Queries.SearchCriteria
                 $"{ToTableFieldMap.GetValueOrDefault(nameof(PhoneNumber))} ILIKE @{nameof(PhoneNumber)}",
                 nameof(PhoneNumber),
                 $"%{PhoneNumber}%"
+            );
+        }
+        
+        if (!string.IsNullOrWhiteSpace(CustSurname))
+        {
+            predicate.And(
+                $"{ToTableFieldMap.GetValueOrDefault(nameof(CustSurname))} ILIKE @{nameof(CustSurname)}",
+                nameof(CustSurname),
+                $"%{CustSurname}%"
             );
         }
 
