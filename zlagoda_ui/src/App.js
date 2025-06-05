@@ -8,6 +8,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProductsPage from "./pages/ProductsPage";
 import EmployeesPage from "./pages/EmployeesPage";
+import CategoriesPage from "./pages/CategoriesPage";
+
 
 export default function App() {
     return (
@@ -23,6 +25,15 @@ export default function App() {
                     element={
                         <PrivateRoute role="Manager">
                             <DashboardManager />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="manager/categories"
+                    element={
+                        <PrivateRoute role="Manager">
+                            <CategoriesPage />
                         </PrivateRoute>
                     }
                 />
