@@ -28,7 +28,6 @@ export default function DashboardManager() {
     return (
         <div className="container-fluid bg-light min-vh-100 py-4">
             <div className="container">
-                {/* Шапка */}
 
                 <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                     <div>
@@ -41,7 +40,6 @@ export default function DashboardManager() {
                     </div>
                 </div>
 
-                {/* Інформація про менеджера */}
                 <div className="row mb-4">
                     <div className="col-md-6">
                         <div className="bg-white rounded shadow-sm p-4 h-100 border">
@@ -56,7 +54,6 @@ export default function DashboardManager() {
                     </div>
                 </div>
 
-                {/* Меню дій */}
                 <div className="row g-3">
                     {[
                         { label: "Працівники", to: "/manager/employees" },

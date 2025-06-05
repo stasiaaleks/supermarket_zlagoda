@@ -10,28 +10,23 @@ export default function LoginPage() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError(""); // скинути стару помилку
+        setError("");
 
         try {
-            // 1. POST /login
             await axios.post(
                 "http://localhost:5112/login",
                 { username, password },
                 { withCredentials: true }
             );
 
-            // 2. GET /api/employees/me — якщо login успішний
             const res = await axios.get("http://localhost:5112/api/employees/me", {
                 withCredentials: true,
             });
 
-            // const role = res.data.role;
             const role = res.data.role.toLowerCase() === "manager" ? "Manager" : "Cashier";
             localStorage.setItem("role", role);
             localStorage.setItem("user", JSON.stringify(res.data));
 
-            // const role = res.data.role.toLowerCase() === "manager" ? "Manager" : "Cashier";
-            // localStorage.setItem("role", role);
 
             navigate(`/${role.toLowerCase()}`);
         } catch (err) {

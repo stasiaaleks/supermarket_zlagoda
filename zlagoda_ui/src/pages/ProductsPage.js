@@ -7,6 +7,7 @@ export default function ProductsPage() {
     const [form, setForm] = useState({ idProduct: "", categoryNumber: "", productName: "", characteristics: "" });
     const [editMode, setEditMode] = useState(false);
     const printRef = useRef();
+    const [filter, setFilter] = useState({ productName: "", categoryName: "" });
 
     useEffect(() => {
         fetchProducts();
@@ -55,6 +56,25 @@ export default function ProductsPage() {
             setError("Помилка при збереженні");
         }
     };
+
+    const handleFilter = async () => {
+        try {
+            const params = {};
+            if (filter.productName) params.productName = filter.productName;
+            if (filter.categoryName) params.categoryName = filter.categoryName;
+
+            const res = await axios.get("http://localhost:5112/api/products/filter", {
+                params,
+                withCredentials: true,
+            });
+
+            setProducts(res.data);
+        } catch (err) {
+            setError("Помилка при фільтрації товарів");
+        }
+    };
+
+
 
     const handlePrint = () => {
         const printWindow = window.open("", "_blank", "width=800,height=600");
@@ -119,6 +139,51 @@ export default function ProductsPage() {
                         <button type="submit" className="btn btn-success w-100">{editMode ? "Зберегти" : "Додати"}</button>
                     </div>
                 </form>
+
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleFilter();
+                    }}
+                    className="row g-3 align-items-end mb-4"
+                >
+                    <div className="col-md-4">
+                        <label className="form-label">Пошук за назвою товару</label>
+                        <input
+                            name="productName"
+                            value={filter.productName}
+                            onChange={(e) => setFilter({ ...filter, productName: e.target.value })}
+                            className="form-control"
+                            placeholder="Назва товару"
+                        />
+                    </div>
+                    <div className="col-md-4">
+                        <label className="form-label">Пошук за назвою категорії</label>
+                        <input
+                            name="categoryName"
+                            value={filter.categoryName}
+                            onChange={(e) => setFilter({ ...filter, categoryName: e.target.value })}
+                            className="form-control"
+                            placeholder="Назва категорії"
+                        />
+                    </div>
+                    <div className="col-md-2">
+                        <button type="submit" className="btn btn-outline-dark w-100">Застосувати фільтр</button>
+                    </div>
+                    <div className="col-md-2">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setFilter({ productName: "", categoryNumber: "" });
+                                fetchProducts();
+                            }}
+                            className="btn btn-secondary w-100"
+                        >
+                            Очистити
+                        </button>
+                    </div>
+                </form>
+
 
                 <div ref={printRef} className="bg-white p-3 shadow-sm rounded border">
                     <table className="table table-hover">
