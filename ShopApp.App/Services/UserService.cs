@@ -67,7 +67,7 @@ public class UserService: IUserService
    
         var createdEntityId = await _userRepo.InsertAsync<string>(userToCreate,  _queryProvider.CreateSingle);
         var newUser = await _userRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId);
-        if (newUser == null) throw new NullReferenceException($"Failed to create an employee {username}");
+        if (newUser == null) throw new ArgumentException($"Failed to create an employee {username}");
 
         return newUser.UserId;
     }

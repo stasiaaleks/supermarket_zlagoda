@@ -60,7 +60,7 @@ public class EmployeeService: IEmployeeService
         var employee = await _employeeRepo.GetByIdAsync(query,id); 
         
         if (employee == null)
-            throw new NullReferenceException($"Employee with id '{id}' not found.");
+            throw new KeyNotFoundException($"Employee with id '{id}' not found.");
 
         return _mapper.Map<EmployeeDto>(employee);
     }
@@ -71,7 +71,7 @@ public class EmployeeService: IEmployeeService
         var employee = await _employeeRepo.GetSingleAsync(query, new { Username = username }); 
         
         if (employee == null)
-            throw new NullReferenceException($"Employee with username '{username}' not found.");
+            throw new KeyNotFoundException($"Employee with username '{username}' not found.");
 
         return _mapper.Map<EmployeeDto>(employee);
     }
@@ -82,7 +82,7 @@ public class EmployeeService: IEmployeeService
         var employeeContacts = await _employeeRepo.GetSingleAsync<EmployeeContactsDto>(query, new { Surname = surname });
         
         if (employeeContacts == null)
-            throw new NullReferenceException($"Contacts for employee with surname '{surname}' not found.");
+            throw new KeyNotFoundException($"Contacts for employee with surname '{surname}' not found.");
         
         return employeeContacts; // fix check for null
     }
@@ -93,7 +93,7 @@ public class EmployeeService: IEmployeeService
         var employee = await _employeeRepo.GetByIdAsync(query, id);
         
         if (employee == null || string.IsNullOrEmpty(employee.Role))
-            throw new NullReferenceException($"Employee with ID '{id}' not found or role is missing.");
+            throw new KeyNotFoundException($"Employee with ID '{id}' not found or role is missing.");
 
         return employee.Role;
     }
@@ -105,7 +105,7 @@ public class EmployeeService: IEmployeeService
         var createdEntityId = await _employeeRepo.InsertAsync<string>(employeeToCreate, _queryProvider.CreateSingle);
         var newEmployee = await _employeeRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId);
 
-        if (newEmployee == null) throw new NullReferenceException($"Failed to create an employee {dto.Name} {dto.Surname}");
+        if (newEmployee == null) throw new ArgumentException($"Failed to create an employee {dto.Name} {dto.Surname}");
         
         return newEmployee.IdEmployee;
     }

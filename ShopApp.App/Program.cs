@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ShopApp.DAL.Extensions;
 using ShopApp.Extensions;
+using ShopApp.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +45,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 // app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
