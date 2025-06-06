@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Enums;
+using ShopApp.Data.SearchCriteria;
 using ShopApp.Services;
 using ShopApp.Services.Auth;
 
@@ -18,7 +19,7 @@ public class EmployeeController : ControllerBase
     {
         _employeeService = employeeService;
     }
-    
+
     [HttpGet]
     [VerifyRole(EmployeeRoles.Manager)]
     [SwaggerOperation(Description = "Returns a list of employees sorted by surname.")]
@@ -28,7 +29,7 @@ public class EmployeeController : ControllerBase
         var employees = await _employeeService.GetAll();
         return Ok(employees);
     }
-    
+
     [HttpGet("cashiers")]
     [VerifyRole(EmployeeRoles.Manager)]
     [SwaggerOperation(Description = "Returns a list of cashiers sorted by surname.")]
@@ -38,7 +39,7 @@ public class EmployeeController : ControllerBase
         var employees = await _employeeService.GetAllCashiers();
         return Ok(employees);
     }
-    
+
     [HttpGet("{id}")]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [OnlySelf(nameof(id), EmployeeRoles.Cashier)]
@@ -48,7 +49,7 @@ public class EmployeeController : ControllerBase
         var employee = await _employeeService.GetById(id);
         return Ok(employee);
     }
-    
+
     [HttpGet("contacts")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(EmployeeContactsDto), StatusCodes.Status200OK)]
@@ -70,11 +71,11 @@ public class EmployeeController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         var info = await _employeeService.GetAllPersonalInfo(employeeId);
         return Ok(info);
     }
-    
+
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -84,18 +85,18 @@ public class EmployeeController : ControllerBase
         if (id == null) return BadRequest();
         return Created();
     }
-    
+
     [HttpPut]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [OnlySelf(nameof(dto.IdEmployee), EmployeeRoles.Cashier)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Update([FromBody] EmployeeDto dto)
     {
-        var id = await _employeeService.UpdateEmployee(dto); 
+        var id = await _employeeService.UpdateEmployee(dto);
         if (id == null) return BadRequest();
         return NoContent();
     }
-    
+
     [HttpDelete("{id}")]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [OnlySelf(nameof(id), EmployeeRoles.Cashier)]
@@ -106,4 +107,14 @@ public class EmployeeController : ControllerBase
         if (!deleted) return BadRequest();
         return NoContent();
     }
+
+    [HttpGet("filter")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FilterProducts([FromQuery] EmployeeSearchCriteria searchCriteria)
+    {
+        var products = await _employeeService.Filter(searchCriteria);
+        return Ok(products);
+    }
 }
+    

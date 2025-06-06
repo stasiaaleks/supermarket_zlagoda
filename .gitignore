@@ -2,4 +2,4 @@ bin/
 .idea/
 obj/
 node_modules/
-package-lock.json
+zlagoda_ui/package-lock.json

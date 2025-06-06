@@ -3,6 +3,7 @@ using ShopApp.DAL.Repository;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
 using ShopApp.Data.QueriesAccess;
+using ShopApp.Data.SearchCriteria;
 
 namespace ShopApp.Services;
 
@@ -19,6 +20,7 @@ public interface IEmployeeService
     Task<string> UpdateEmployee(EmployeeDto dto);
     Task<bool> DeleteEmployee(string id);
     Task<PersonalEmployeeInfoDto> GetAllPersonalInfo(string id);
+    Task<IEnumerable<EmployeeDto>> Filter(EmployeeSearchCriteria criteria);
 }
 
 public class EmployeeService: IEmployeeService
@@ -137,5 +139,12 @@ public class EmployeeService: IEmployeeService
         dto.Username = username;
         dto.Checks = checks.ToList();
         return dto;
+    }
+    
+    public async Task<IEnumerable<EmployeeDto>> Filter(EmployeeSearchCriteria criteria)
+    {
+        var query = _queryProvider.GetAll;
+        var employees = await _employeeRepo.FilterByPredicateAsync<EmployeeDto>(query, criteria);
+        return employees;
     }
 } 
