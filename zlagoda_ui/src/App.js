@@ -9,7 +9,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ProductsPage from "./pages/ProductsPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import CategoriesPage from "./pages/CategoriesPage";
-
+import ChecksPage from "./pages/ChecksPage";
 
 export default function App() {
     return (
@@ -64,6 +64,15 @@ export default function App() {
                     element={
                         <PrivateRoute role="Cashier">
                             <DashboardCashier />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/cashier/checks"
+                    element={
+                        <PrivateRoute role="Cashier">
+                            <ChecksPage />
                         </PrivateRoute>
                     }
                 />
