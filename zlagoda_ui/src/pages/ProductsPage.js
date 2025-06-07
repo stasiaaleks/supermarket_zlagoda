@@ -136,7 +136,10 @@ export default function ProductsPage() {
                         <input name="characteristics" value={form.characteristics} onChange={handleChange} className="form-control" placeholder="Характеристики" />
                     </div>
                     <div className="col-md-2">
-                        <button type="submit" className="btn btn-success w-100">{editMode ? "Зберегти" : "Додати"}</button>
+                        <button type="submit" className="btn btn-success w-100" disabled title="Збереження ще не підтримується">
+                            {editMode ? "Зберегти" : "Додати"}
+                        </button>
+
                     </div>
                 </form>
 
