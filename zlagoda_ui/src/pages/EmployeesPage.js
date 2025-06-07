@@ -175,7 +175,6 @@ export default function EmployeesPage() {
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="row g-2 mb-4">
-                    <div className="col-md-2"><input name="idEmployee" value={form.idEmployee} onChange={handleChange} className="form-control" placeholder="ID" required /></div>
                     <div className="col-md-2"><input name="surname" value={form.surname} onChange={handleChange} className="form-control" placeholder="Прізвище" required /></div>
                     <div className="col-md-2"><input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Імʼя" required /></div>
                     <div className="col-md-2"><input name="patronymic" value={form.patronymic} onChange={handleChange} className="form-control" placeholder="По батькові" /></div>
@@ -241,13 +240,12 @@ export default function EmployeesPage() {
                     <table className="table table-hover">
                         <thead className="table-light">
                         <tr>
-                            <th>ID</th><th>ПІБ</th><th>Посада</th><th>Телефон</th><th>Зарплата</th><th>Дата старту</th><th>Вулиця</th><th>Індекс</th><th>Дії</th>
+                            <th>ПІБ</th><th>Посада</th><th>Телефон</th><th>Зарплата</th><th>Дата старту</th><th>Вулиця</th><th>Індекс</th><th>Дії</th>
                         </tr>
                         </thead>
                         <tbody>
                         {employees.map(emp => (
                             <tr key={emp.idEmployee}>
-                                <td>{emp.idEmployee}</td>
                                 <td>{emp.surname} {emp.name} {emp.patronymic}</td>
                                 <td>{emp.role}</td>
                                 <td>{emp.phoneNumber}</td>

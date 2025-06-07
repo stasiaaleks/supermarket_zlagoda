@@ -52,7 +52,7 @@ export default function DashboardCashier() {
             <hr/>
             <h4>Панель касира</h4>
 
-            <div className="row g-3">
+            <div className="row g-3">   
                 {[
                     { label: "Товари", to: "/cashier/products" },
                     { label: "Товари в магазині", to: "/cashier/store-products" },
