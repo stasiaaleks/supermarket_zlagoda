@@ -105,11 +105,9 @@ public class EmployeeService: IEmployeeService
         var employeeToCreate = _mapper.Map<Employee>(dto);
         employeeToCreate.IdEmployee = await _employeeRepo.GetNextPrefixedStringId("E", _queryProvider.GetSeqNextVal);
         var createdEntityId = await _employeeRepo.InsertAsync<string>(employeeToCreate, _queryProvider.CreateSingle);
-        var newEmployee = await _employeeRepo.GetByIdAsync( _queryProvider.GetById, createdEntityId);
-
-        if (newEmployee == null) throw new ArgumentException($"Failed to create an employee {dto.Name} {dto.Surname}");
         
-        return newEmployee.IdEmployee;
+        if (createdEntityId == null) throw new ArgumentException($"Failed to create an employee {dto.Name} {dto.Surname}");
+        return createdEntityId;
     }
 
     public async Task<string> UpdateEmployee(EmployeeDto dto)
