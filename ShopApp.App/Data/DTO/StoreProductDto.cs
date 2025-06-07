@@ -6,6 +6,7 @@ public class StoreProductDto {
     public int ProductsNumber { get; set; }
     public string ProductName { get; set; }
     public string Characteristics { get; set; }
+    public bool PromotionalProduct { get; set; }
 }
 
 public class StoreProductPriceNumberDto
