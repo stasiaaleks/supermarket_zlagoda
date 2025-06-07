@@ -21,7 +21,7 @@ public class StoreProductController : ControllerBase
 
     [HttpGet]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
-    [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         var products = await _productService.GetAll();
