@@ -44,7 +44,7 @@ export default function CardsPage() {
         const content = cloned.innerHTML;
 
         const html = `
-            <html>
+            <html lang="uk">
             <head>
                 <title>Звіт по клієнтах</title>
                 <style>

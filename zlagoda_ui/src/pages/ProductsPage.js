@@ -84,7 +84,7 @@ export default function ProductsPage() {
         cloned.querySelectorAll("th:last-child, td:last-child").forEach(el => el.remove());
         const content = cloned.innerHTML;
         const html = `
-      <html>
+      <html lang="uk">
         <head>
           <title>Звіт про товари</title>
           <style>

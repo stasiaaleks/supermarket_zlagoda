@@ -58,7 +58,7 @@ export default function StoreProductsPage() {
         const content = cloned.innerHTML;
 
         const html = `
-        <html>
+        <html lang="uk">
         <head>
           <title>Звіт по товарах у магазині</title>
           <style>
