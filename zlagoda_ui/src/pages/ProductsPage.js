@@ -4,7 +4,7 @@ import axios from "axios";
 export default function ProductsPage() {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState("");
-    const [form, setForm] = useState({ idProduct: "", categoryNumber: "", productName: "", characteristics: "" });
+    const [form, setForm] = useState({ categoryName: "", productName: "", characteristics: "" });
     const [editMode, setEditMode] = useState(false);
     const printRef = useRef();
     const [filter, setFilter] = useState({ productName: "", categoryName: "" });
@@ -124,10 +124,7 @@ export default function ProductsPage() {
 
                 <form onSubmit={handleSubmit} className="row g-3 mb-4">
                     <div className="col-md-3">
-                        <input name="idProduct" value={form.idProduct} onChange={handleChange} className="form-control" placeholder="ID товару" required />
-                    </div>
-                    <div className="col-md-3">
-                        <input name="categoryNumber" value={form.categoryNumber} onChange={handleChange} className="form-control" placeholder="ID категорії" required />
+                        <input name="categoryNumber" value={form.categoryNumber} onChange={handleChange} className="form-control" placeholder="№ категорії" required />
                     </div>
                     <div className="col-md-3">
                         <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Назва товару" required />
@@ -192,7 +189,6 @@ export default function ProductsPage() {
                     <table className="table table-hover">
                         <thead className="table-light">
                         <tr>
-                            <th>ID</th>
                             <th>Категорія</th>
                             <th>Назва</th>
                             <th>Характеристики</th>
@@ -202,8 +198,7 @@ export default function ProductsPage() {
                         <tbody>
                         {products.map((prod) => (
                             <tr key={prod.idProduct}>
-                                <td>{prod.idProduct}</td>
-                                <td>{prod.categoryNumber}</td>
+                                <td>{prod.categoryName}</td>
                                 <td>{prod.productName}</td>
                                 <td>{prod.characteristics}</td>
                                 <td>

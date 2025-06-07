@@ -9,5 +9,6 @@ public class StoreProductProfile : Profile
     public StoreProductProfile()
     {
         CreateMap<StoreProduct, StoreProductPriceNumberDto>();
+        CreateMap<StoreProduct, StoreProductDto>();
     }
 }

@@ -31,8 +31,8 @@ public class StoreProductService : IStoreProductService
     
     public async Task<IEnumerable<StoreProductDto>> GetAll()
     {
-        var products = await _productRepo.GetAllAsync(_queryProvider.GetAll);
-        return _mapper.Map<IEnumerable<StoreProductDto>>(products);
+        var products = await _productRepo.GetAllAsync<StoreProductDto>(_queryProvider.GetAll);
+        return products;
     }
 
     public async Task<StoreProductPriceNumberDto> GetPriceAndNumberByUpc(string upc)

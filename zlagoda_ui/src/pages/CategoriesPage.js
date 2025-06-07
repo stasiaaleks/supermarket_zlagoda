@@ -137,7 +137,7 @@ export default function CategoriesPage() {
 
                 <form onSubmit={handleSubmit} className="row g-3 mb-4">
                     <div className="col-md-4">
-                        <input name="categoryNumber" value={form.categoryNumber} onChange={handleChange} className="form-control" placeholder="ID категорії" required />
+                        <input name="categoryNumber" value={form.categoryNumber} onChange={handleChange} className="form-control" placeholder="№ категорії" required />
                     </div>
                     <div className="col-md-4">
                         <input name="categoryName" value={form.categoryName} onChange={handleChange} className="form-control" placeholder="Назва категорії" required />
@@ -151,7 +151,6 @@ export default function CategoriesPage() {
                     <table className="table table-hover">
                         <thead className="table-light">
                         <tr>
-                            <th>ID</th>
                             <th>Назва</th>
                             <th>Дії</th>
                         </tr>
@@ -159,7 +158,6 @@ export default function CategoriesPage() {
                         <tbody>
                         {categories.map((c) => (
                             <tr key={c.categoryNumber}>
-                                <td>{c.categoryNumber}</td>
                                 <td>{c.categoryName}</td>
                                 <td>
                                     <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(c)}>Редагувати</button>
