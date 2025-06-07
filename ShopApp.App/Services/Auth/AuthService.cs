@@ -1,3 +1,4 @@
+using System.Transactions;
 using AutoMapper;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
@@ -8,7 +9,8 @@ namespace ShopApp.Services.Auth;
 public interface IAuthService
 {
     Task<User?> Authenticate(string username, string password);
-    Task<User> Register(RegisterDto dto);
+    Task<User> RegisterUserWithEmployee(RegisterDto dto);
+    Task<User> RegisterForExistingEmployee(CreateUserDto dto);
 }
 
 
@@ -37,11 +39,26 @@ public class AuthService: IAuthService
         return isValid ? user : null;
     }
 
-    public async Task<User> Register(RegisterDto dto)
+    public async Task<User> RegisterUserWithEmployee(RegisterDto dto)
     {
         var employeeDto = _mapper.Map<CreateEmployeeDto>(dto);
-        var newEmployeeId = await _employeeService.CreateEmployee(employeeDto);
-        var newUserId = await _userService.CreateUser(dto.Username, dto.Password, newEmployeeId);
+        int? newUserId;
+        using (var transaction = new TransactionScope())
+        {
+            var newEmployeeId = await _employeeService.CreateEmployee(employeeDto);
+            newUserId = await _userService.CreateUser(dto.Username, dto.Password, newEmployeeId);
+            transaction.Complete();
+        }
+        
+        return await _userService.GetById(newUserId.Value);
+    }
+    
+    public async Task<User> RegisterForExistingEmployee(CreateUserDto dto)
+    {
+        var exists = (await _employeeService.GetById(dto.IdEmployee)) != null;
+        if (!exists) throw new KeyNotFoundException($"Employee with id {dto.IdEmployee} not found");
+        
+        var newUserId = await _userService.CreateUser(dto.Username, dto.Password, dto.IdEmployee);
         return await _userService.GetById(newUserId);
     }
 }

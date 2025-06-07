@@ -32,12 +32,20 @@ public class AuthController: ControllerBase
     }
     
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+    public async Task<IActionResult> RegisterUserWithEmployee([FromBody] RegisterDto dto)
     {
-        var createdUser = await _authService.Register(dto);
+        var createdUser = await _authService.RegisterUserWithEmployee(dto);
         if (createdUser == null) return BadRequest();
         
         await LoginUser(createdUser); 
+        return Ok();
+    }
+    
+    [HttpPost("register/existing-employee")]
+    public async Task<IActionResult> RegisterUserForExistingEmployee([FromBody] CreateUserDto dto)
+    {
+        var createdUser = await _authService.RegisterForExistingEmployee(dto);
+        if (createdUser == null) return BadRequest();
         return Ok();
     }
     
