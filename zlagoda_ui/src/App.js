@@ -13,7 +13,6 @@ import ChecksPage from "./pages/ChecksPage";
 import CardsPage from "./pages/CardsPage";
 import StoreProductPage from "./pages/StoreProductPage";
 
-
 export default function App() {
     return (
         <BrowserRouter>
@@ -31,6 +30,8 @@ export default function App() {
                         </PrivateRoute>
                     }
                 />
+
+                <Route path="manager/checks" element={<ChecksPage />} />
 
                 <Route path="/manager/store-products" element={<StoreProductPage />} />
 
