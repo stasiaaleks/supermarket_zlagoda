@@ -62,5 +62,14 @@ public class CheckController : ControllerBase
         return Ok(sumDto);
     }
     
+    [HttpGet("{number}/sales")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(CheckWithSalesListDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByNumberWithSales([FromRoute] string number)
+    {
+        var checkDto = await _checkService.GetByNumberWithSales(number);
+        return Ok(checkDto);
+    }
+    
     
 }

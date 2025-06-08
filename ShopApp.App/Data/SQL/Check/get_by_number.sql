@@ -11,6 +11,7 @@
     p.manufacturer,
 
     s.product_number AS quantity,
+    s.upc,
     s.selling_price,
     (s.product_number * s.selling_price) AS total_price_per_product
 

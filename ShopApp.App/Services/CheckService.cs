@@ -1,3 +1,4 @@
+using System.Transactions;
 using AutoMapper;
 using ShopApp.DAL.Repository;
 using ShopApp.Data.DTO;
@@ -13,6 +14,7 @@ public interface ICheckService
     Task<IEnumerable<CheckWithSalesListDto>> GetAllWithSalesByPeriodAndCashier(DateTime start, DateTime end, string cashierId);
     Task<CheckSumDto> GetSumByPeriod(DateTime start, DateTime end);
     Task<CheckSumDto> GetSumByEmployeeAndPeriod(DateTime start, DateTime end, string cashierId);
+    Task<CheckWithSalesListDto> GetByNumberWithSales(string number);
 }
 
 public class CheckService : ICheckService
@@ -53,6 +55,14 @@ public class CheckService : ICheckService
         var query = _queryProvider.GetSumByPeriod;
         var parameters = new { StartDate = start, EndDate = end };
         return await _checkRepo.GetSingleAsync<CheckSumDto>(query, parameters);
+    }
+    
+    public async Task<CheckWithSalesListDto> GetByNumberWithSales(string number)
+    {
+        var query = _queryProvider.GetByNum;
+        var parameters = new { CheckNumber = number };
+        var checks = await _checkRepo.GetAllAsync<CheckWithSaleDto>(query, parameters);
+        return _mapper.Map<IEnumerable<CheckWithSalesListDto>>(checks).ToList()[0];
     }
 
     public async Task<CheckSumDto> GetSumByEmployeeAndPeriod(DateTime start, DateTime end, string cashierId)
