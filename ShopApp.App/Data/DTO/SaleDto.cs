@@ -15,6 +15,7 @@ public class SaleDto: ISaleDto
     public int ProductNumber { get; set; }
     public string? ProductName { get; set; }
     public decimal SellingPrice { get; set; }
+    public int? TotalPricePerProduct { get; set; }
 }
 
 public class CreateSaleDto : SaleDto
