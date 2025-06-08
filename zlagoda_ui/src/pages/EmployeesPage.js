@@ -65,7 +65,11 @@ export default function EmployeesPage() {
     };
 
     const handleEdit = (emp) => {
-        setForm(emp);
+        setForm({
+            ...emp,
+            dateOfBirth: emp.dateOfBirth?.slice(0, 10),
+            dateOfStart: emp.dateOfStart?.slice(0, 10),
+        });
         setEditMode(true);
     };
 
@@ -160,7 +164,7 @@ export default function EmployeesPage() {
 
     return (
         <div className="container-fluid bg-light min-vh-100 py-4">
-            <div className="container">
+            <div className="container-fluid px-4">
                 <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                     <div>
                         <h2 className="fw-bold mb-0">Працівники</h2>
@@ -175,18 +179,63 @@ export default function EmployeesPage() {
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="row g-2 mb-4">
-                    <div className="col-md-2"><input name="surname" value={form.surname} onChange={handleChange} className="form-control" placeholder="Прізвище" required /></div>
-                    <div className="col-md-2"><input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Імʼя" required /></div>
-                    <div className="col-md-2"><input name="patronymic" value={form.patronymic} onChange={handleChange} className="form-control" placeholder="По батькові" /></div>
-                    <div className="col-md-2"><select name="role" value={form.role} onChange={handleChange} className="form-select"><option>Cashier</option><option>Manager</option></select></div>
-                    <div className="col-md-2"><input name="salary" type="number" value={form.salary} onChange={handleChange} className="form-control" placeholder="Зарплата" /></div>
-                    <div className="col-md-3"><input name="dateOfBirth" type="date" value={form.dateOfBirth} onChange={handleChange} className="form-control" /></div>
-                    <div className="col-md-3"><input name="dateOfStart" type="date" value={form.dateOfStart} onChange={handleChange} className="form-control" /></div>
-                    <div className="col-md-3"><input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} className="form-control" placeholder="Телефон" /></div>
-                    <div className="col-md-2"><input name="city" value={form.city} onChange={handleChange} className="form-control" placeholder="Місто" /></div>
-                    <div className="col-md-2"><input name="street" value={form.street} onChange={handleChange} className="form-control" placeholder="Вулиця" /></div>
-                    <div className="col-md-2"><input name="zipCode" value={form.zipCode} onChange={handleChange} className="form-control" placeholder="Індекс" /></div>
-                    <div className="col-md-2 d-grid"><button type="submit" className="btn btn-success">{editMode ? "Зберегти" : "Додати"}</button></div>
+                    <div className="col-md-2">
+                        <input name="surname" value={form.surname} onChange={handleChange} className="form-control" placeholder="Прізвище" required />
+                    </div>
+                    <div className="col-md-2">
+                        <input name="name" value={form.name} onChange={handleChange} className="form-control" placeholder="Імʼя" required />
+                    </div>
+                    <div className="col-md-2">
+                        <input name="patronymic" value={form.patronymic} onChange={handleChange} className="form-control" placeholder="По батькові" />
+                    </div>
+                    <div className="col-md-2">
+                        <select name="role" value={form.role} onChange={handleChange} className="form-select">
+                            <option>Cashier</option>
+                            <option>Manager</option>
+                        </select>
+                    </div>
+                    <div className="col-md-2">
+                        <input name="salary" type="number" value={form.salary} onChange={handleChange} className="form-control" placeholder="Зарплата" />
+                    </div>
+                    <div className="col-md-3">
+                        <div className="input-group">
+                            <span className="input-group-text">Дата народження</span>
+                            <input
+                                name="dateOfBirth"
+                                type="date"
+                                value={form.dateOfBirth}
+                                onChange={handleChange}
+                                className="form-control"
+                            />
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="input-group">
+                            <span className="input-group-text">Початок роботи</span>
+                            <input
+                                name="dateOfStart"
+                                type="date"
+                                value={form.dateOfStart}
+                                onChange={handleChange}
+                                className="form-control"
+                            />
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <input name="phoneNumber" value={form.phoneNumber} onChange={handleChange} className="form-control" placeholder="Телефон" />
+                    </div>
+                    <div className="col-md-2">
+                        <input name="city" value={form.city} onChange={handleChange} className="form-control" placeholder="Місто" />
+                    </div>
+                    <div className="col-md-2">
+                        <input name="street" value={form.street} onChange={handleChange} className="form-control" placeholder="Вулиця" />
+                    </div>
+                    <div className="col-md-2">
+                        <input name="zipCode" value={form.zipCode} onChange={handleChange} className="form-control" placeholder="Індекс" />
+                    </div>
+                    <div className="col-md-2 d-grid">
+                        <button type="submit" className="btn btn-success">{editMode ? "Зберегти" : "Додати"}</button>
+                    </div>
                 </form>
 
                 <div className="d-flex gap-2 mb-3">
@@ -213,44 +262,77 @@ export default function EmployeesPage() {
                             <tr>
                                 <th>Прізвище</th>
                                 <th>Імʼя</th>
+                                <th>По батькові</th>
+                                <th>Посада</th>
+                                <th>Зарплата</th>
+                                <th>Дата народження</th>
+                                <th>Дата старту</th>
                                 <th>Телефон</th>
                                 <th>Місто</th>
                                 <th>Вулиця</th>
                                 <th>Індекс</th>
+                                <th>Дії</th>
                             </tr>
                             </thead>
+
+
                             <tbody>
-                            {contacts.map((c, i) => (
-                                <tr key={i}>
-                                    <td>{c.surname}</td>
-                                    <td>{c.name}</td>
-                                    <td>{c.phoneNumber}</td>
-                                    <td>{c.city}</td>
-                                    <td>{c.street}</td>
-                                    <td>{c.zipCode}</td>
+                            {employees.map(emp => (
+                                <tr key={emp.idEmployee}>
+                                    <td>{emp.surname}</td>
+                                    <td>{emp.name}</td>
+                                    <td>{emp.patronymic}</td>
+                                    <td>{emp.role}</td>
+                                    <td>{emp.salary} грн</td>
+                                    <td>{new Date(emp.dateOfBirth).toLocaleDateString()}</td>
+                                    <td>{new Date(emp.dateOfStart).toLocaleDateString()}</td>
+                                    <td>{emp.phoneNumber}</td>
+                                    <td>{emp.city}</td>
+                                    <td>{emp.street}</td>
+                                    <td>{emp.zipCode}</td>
+                                    <td>
+                                        <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(emp)}>Редагувати</button>
+                                        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(emp.idEmployee)}>Видалити</button>
+                                    </td>
                                 </tr>
                             ))}
                             </tbody>
+
                         </table>
                         <button onClick={handlePrintContacts} className="btn btn-outline-dark">Друк контактів</button>
                     </div>
                 )}
 
-                <div ref={printRef} className="bg-white p-3 shadow-sm rounded border">
-                    <table className="table table-hover">
+                <div ref={printRef} className="bg-white p-3 shadow-sm rounded border table-responsive">
+                    <table className="table table-hover w-200">
                         <thead className="table-light">
                         <tr>
-                            <th>ПІБ</th><th>Посада</th><th>Телефон</th><th>Зарплата</th><th>Дата старту</th><th>Вулиця</th><th>Індекс</th><th>Дії</th>
+                            <th>Прізвище</th>
+                            <th>Імʼя</th>
+                            <th>По батькові</th>
+                            <th>Посада</th>
+                            <th>Зарплата</th>
+                            <th>Дата народження</th>
+                            <th>Дата старту</th>
+                            <th>Телефон</th>
+                            <th>Місто</th>
+                            <th>Вулиця</th>
+                            <th>Індекс</th>
+                            <th>Дії</th>
                         </tr>
                         </thead>
                         <tbody>
                         {employees.map(emp => (
                             <tr key={emp.idEmployee}>
-                                <td>{emp.surname} {emp.name} {emp.patronymic}</td>
+                                <td>{emp.surname}</td>
+                                <td>{emp.name}</td>
+                                <td>{emp.patronymic}</td>
                                 <td>{emp.role}</td>
-                                <td>{emp.phoneNumber}</td>
                                 <td>{emp.salary} грн</td>
+                                <td>{new Date(emp.dateOfBirth).toLocaleDateString()}</td>
                                 <td>{new Date(emp.dateOfStart).toLocaleDateString()}</td>
+                                <td>{emp.phoneNumber}</td>
+                                <td>{emp.city}</td>
                                 <td>{emp.street}</td>
                                 <td>{emp.zipCode}</td>
                                 <td>

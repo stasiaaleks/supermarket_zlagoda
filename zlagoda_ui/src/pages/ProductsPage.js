@@ -8,6 +8,15 @@ export default function ProductsPage() {
     const [editMode, setEditMode] = useState(false);
     const printRef = useRef();
     const [filter, setFilter] = useState({ productName: "", categoryName: "" });
+    const [categoryOptions, setCategoryOptions] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:5112/api/сategories", { withCredentials: true })
+            .then(res => setCategoryOptions(res.data))
+            .catch(() => setError("Не вдалося завантажити список категорій"));
+    }, []);
+
+
 
     useEffect(() => {
         fetchProducts();
@@ -158,14 +167,20 @@ export default function ProductsPage() {
                         />
                     </div>
                     <div className="col-md-4">
-                        <label className="form-label">Пошук за назвою категорії</label>
-                        <input
+                        <label className="form-label">Пошук за категорією</label>
+                        <select
                             name="categoryName"
                             value={filter.categoryName}
                             onChange={(e) => setFilter({ ...filter, categoryName: e.target.value })}
-                            className="form-control"
-                            placeholder="Назва категорії"
-                        />
+                            className="form-select"
+                        >
+                            <option value="">Усі категорії</option>
+                            {categoryOptions.map((cat) => (
+                                <option key={cat.categoryNumber} value={cat.categoryName}>
+                                    {cat.categoryName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className="col-md-2">
                         <button type="submit" className="btn btn-outline-dark w-100">Застосувати фільтр</button>
