@@ -10,6 +10,11 @@ namespace ShopApp.Services;
 public interface ICategoryService
 {
     Task<IEnumerable<CategoryDto>> GetAll();
+    Task<IEnumerable<CategoryDto>> GetByNum(int number);
+    Task<int> CreateCategory(CategoryDto dto);
+    Task<int> UpdateByNum(CategoryDto dto);
+    Task<bool> DeleteByNum(string number);
+    
     Task<IEnumerable<CategoryDto>> Filter(CategorySearchCriteria criteria);
 }
 
@@ -30,6 +35,7 @@ public class CategoryService : ICategoryService
     {
         return await _categoryRepo.GetAllAsync<CategoryDto>(_queryProvider.GetAll);
     }
+    
 
     public async Task<IEnumerable<CategoryDto>> Filter(CategorySearchCriteria criteria)
     {
@@ -37,4 +43,34 @@ public class CategoryService : ICategoryService
         var categories = await _categoryRepo.FilterByPredicateAsync<CategoryDto>(query, criteria);
         return categories;
     }
+    public async Task<IEnumerable<CategoryDto>> GetByNum(int number)
+    {
+        var categories = await _categoryRepo.GetAllAsync<Category>(
+            _queryProvider.GetByNum,
+            new { CategoryNumber = number }
+        );
+        return _mapper.Map<IEnumerable<CategoryDto>>(categories);
+    }
+
+    public async Task<int> CreateCategory(CategoryDto dto)
+    {
+        var category = _mapper.Map<Category>(dto);
+        var newId = await _categoryRepo.InsertAsync<int>(category, _queryProvider.CreateSingle);
+        return newId;
+    }
+    
+    public async Task<int> UpdateByNum(CategoryDto dto)
+    {
+        var categoryToUpdate = _mapper.Map<Category>(dto);
+        var updatedId = await _categoryRepo.UpdateAsync<int>(categoryToUpdate, _queryProvider.UpdateByNum);
+        return updatedId;
+    }
+
+    public async Task<bool> DeleteByNum(string number)
+    {
+        var rows = await _categoryRepo.DeleteByIdAsync(_queryProvider.DeleteByNum, number);
+        return rows > 0;
+    }
+
+
 }

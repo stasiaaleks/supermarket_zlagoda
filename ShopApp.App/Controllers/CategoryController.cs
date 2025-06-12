@@ -27,6 +27,45 @@ public class CategoryController : ControllerBase
         return Ok(categories);
     }
     
+    [HttpGet("{number}")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByNum(int number)
+    {
+        var categories = await _categoryService.GetByNum(number);
+        return Ok(categories);
+    }
+    
+    [HttpPost]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] CategoryDto dto)
+    {
+        var number = await _categoryService.CreateCategory(dto);
+        if (number == null) return BadRequest();
+        return Created();
+    }
+    
+    [HttpDelete("{number}")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteByNum(string number)
+    {
+        await _categoryService.DeleteByNum(number);
+        return NoContent();
+    }
+
+    [HttpPut]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateByNum(int number, [FromBody] CategoryDto dto)
+    {
+        await _categoryService.UpdateByNum(dto);
+        return NoContent();
+    }
+
+    
+    
     [HttpGet("filter")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
