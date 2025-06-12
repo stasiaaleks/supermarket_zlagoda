@@ -32,6 +32,7 @@ public class CheckWithSaleDto: ICheckDto, ISaleDto
     public string UPC { get; set; }
     public string ProductName { get; set; }
     public int ProductNumber { get; set; }
+    public int TotalPricePerProduct { get; set; }
     public decimal SellingPrice { get; set; }
 }
 

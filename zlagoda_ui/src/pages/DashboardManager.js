@@ -57,9 +57,9 @@ export default function DashboardManager() {
                 <div className="row g-3">
                     {[
                         { label: "Працівники", to: "/manager/employees" },
-                        { label: "Клієнти", to: "/manager/clients" },
-                        { label: "Категорії товарів", to: "/manager/categories" },
                         { label: "Товари", to: "/manager/products" },
+                        { label: "Категорії товарів", to: "/manager/categories" },
+                        { label: "Картки клієнтів", to: "/manager/cards" },
                         { label: "Товари в магазині", to: "/manager/store-products" },
                         { label: "Чеки", to: "/manager/checks" },
                         { label: "Продажі / Статистика", to: "/manager/sales" },

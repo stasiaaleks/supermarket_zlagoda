@@ -36,7 +36,8 @@ public class FlatToGroupedChecksConverter : ITypeConverter<IEnumerable<CheckWith
                         ProductName = sale.ProductName,
                         ProductNumber = sale.ProductNumber,
                         SellingPrice = sale.SellingPrice,
-                        CheckNumber = firstCheck.CheckNumber
+                        CheckNumber = firstCheck.CheckNumber,
+                        TotalPricePerProduct = sale.TotalPricePerProduct,
                     }).ToList()
                 };
             })

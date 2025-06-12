@@ -29,7 +29,7 @@ public class CheckController : ControllerBase
     [HttpGet("sales")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(IEnumerable<CheckWithSalesListDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetChecksWithSales([FromQuery] DateTime start, [FromQuery] DateTime end)
+    public async Task<IActionResult> GetChecksWithSales([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
         var checks = await _checkService.GetAllWithSalesByPeriod(start, end);
         return Ok(checks);
@@ -38,7 +38,7 @@ public class CheckController : ControllerBase
     [HttpGet("cashiers/{cashierId}/sales")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(IEnumerable<CheckWithSalesListDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetChecksWithSalesByCashier([FromQuery] DateTime start, [FromQuery] DateTime end, [FromRoute] string cashierId)
+    public async Task<IActionResult> GetChecksWithSalesByCashier([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromRoute] string cashierId)
     {
         var checks = await _checkService.GetAllWithSalesByPeriodAndCashier(start, end, cashierId);
         return Ok(checks);
@@ -47,7 +47,7 @@ public class CheckController : ControllerBase
     [HttpGet("sum")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(CheckSumDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetChecksSumByPeriod([FromQuery] DateTime start, [FromQuery] DateTime end)
+    public async Task<IActionResult> GetChecksSumByPeriod([FromQuery] DateTime? start, [FromQuery] DateTime? end)
     {
         var sumDto = await _checkService.GetSumByPeriod(start, end);
         return Ok(sumDto);
@@ -56,10 +56,19 @@ public class CheckController : ControllerBase
     [HttpGet("cashiers/{cashierId}/sum")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(typeof(CheckSumDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetChecksSumByPeriodAndCashier([FromQuery] DateTime start, [FromQuery] DateTime end, [FromRoute] string cashierId)
+    public async Task<IActionResult> GetChecksSumByPeriodAndCashier([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromRoute] string cashierId)
     {
         var sumDto = await _checkService.GetSumByEmployeeAndPeriod(start, end, cashierId);
         return Ok(sumDto);
+    }
+    
+    [HttpGet("{number}/sales")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(typeof(CheckWithSalesListDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetByNumberWithSales([FromRoute] string number)
+    {
+        var checkDto = await _checkService.GetByNumberWithSales(number);
+        return Ok(checkDto);
     }
     
     

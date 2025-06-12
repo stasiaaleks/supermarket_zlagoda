@@ -10,6 +10,8 @@ import ProductsPage from "./pages/ProductsPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import ChecksPage from "./pages/ChecksPage";
+import CardsPage from "./pages/CardsPage";
+import StoreProductPage from "./pages/StoreProductPage";
 
 export default function App() {
     return (
@@ -28,6 +30,12 @@ export default function App() {
                         </PrivateRoute>
                     }
                 />
+
+                <Route path="manager/checks" element={<ChecksPage />} />
+
+                <Route path="/manager/store-products" element={<StoreProductPage />} />
+
+                <Route path="/manager/cards" element={<CardsPage />} />
 
                 <Route
                     path="manager/categories"
