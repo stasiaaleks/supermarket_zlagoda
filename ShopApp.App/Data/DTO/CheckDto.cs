@@ -47,6 +47,16 @@ public class CheckWithSalesListDto: ICheckDto
     public List<SaleDto> Sales { get; set; } = [];
 }
 
+public class CreateCheckWithSalesListDto: ICheckDto
+{
+    public string IdEmployee { get; set; }
+    public string? CardNumber { get; set; }
+    public DateTime PrintDate { get; set; }
+    public decimal SumTotal { get; set; }
+    public decimal VAT { get; set; }
+    public List<CreateSaleDto> Sales { get; set; } = [];
+}
+
 public class CheckSumDto
 {
     public decimal TotalSum { get; set; }

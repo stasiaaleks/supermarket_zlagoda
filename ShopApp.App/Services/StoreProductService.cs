@@ -14,6 +14,7 @@ public interface IStoreProductService
     Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria);
     Task<IEnumerable<StoreProductDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria);
     Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria);
+    Task<string> UpdateAmount(int delta, string productUpc);
 }
 
 public class StoreProductService : IStoreProductService
@@ -59,6 +60,20 @@ public class StoreProductService : IStoreProductService
         var query = _queryProvider.GetAllPromotional;
         var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
         return products;
+    }
+    
+    public async Task<string> UpdateAmount(int delta, string productUpc)
+    {
+        var product = await _productRepo.GetSingleAsync<StoreProduct>(_queryProvider.GetByUpc, new { UPC = productUpc });
+        if (product == null) throw new ArgumentException($"Failed to find a product with UPC {productUpc}");
+        
+        var query = _queryProvider.UpdateByUpc;
+        var prevAmount = product.ProductsNumber;
+        var newAmount = prevAmount + delta;
+        if (newAmount < 0) throw new ArgumentException($"Product number is: {prevAmount}. Attempting to withdraw {-delta}");
+        product.ProductsNumber = newAmount;
+        
+        return await _productRepo.UpdateAsync<string>(product, query);
     }
 
     // consider adding SortableCriteria or similar refactoring

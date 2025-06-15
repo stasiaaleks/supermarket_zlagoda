@@ -10,10 +10,11 @@ public class CheckQueryProvider: IQueryByNamespaceProvider
     private const string GetSumByPeriodAndEmployeeQuery = "get_sum_by_employee_period";
     private const string GetByNumQuery = "get_by_number";
     private const string GetByTodayQuery = "get_by_today";
-
+    private const string GetSeqNextValQuery = "get_seq_nextval";
     
     private const string CreateSingleQuery = "create_single";
     private const string DeleteByNumQuery = "delete_by_number";
+    
 
     public string GetAll => GetNamespace(GetAllQuery);
     public string GetAllWithSalesByPeriod => GetNamespace(GetAllWithSalesByPeriodQuery);
@@ -24,6 +25,8 @@ public class CheckQueryProvider: IQueryByNamespaceProvider
     public string DeleteByNum => GetNamespace(DeleteByNumQuery);
     public string GetByNum => GetNamespace(GetByNumQuery);
     public string GetByToday => GetNamespace(GetByTodayQuery);
+    
+    public string GetSeqNextVal => GetNamespace(GetSeqNextValQuery);
 
 
     

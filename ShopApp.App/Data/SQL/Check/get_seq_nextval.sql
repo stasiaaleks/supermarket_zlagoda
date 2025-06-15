@@ -1,0 +1,1 @@
+SELECT NEXTVAL('public.check_number_check_seq');

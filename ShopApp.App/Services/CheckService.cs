@@ -1,3 +1,5 @@
+
+using System.Transactions;
 using AutoMapper;
 using ShopApp.DAL.Repository;
 using ShopApp.Data.DTO;
@@ -14,19 +16,24 @@ public interface ICheckService
     Task<CheckSumDto> GetSumByPeriod(DateTime? start, DateTime? end);
     Task<CheckSumDto> GetSumByEmployeeAndPeriod(DateTime? start, DateTime? end, string cashierId);
     Task<CheckWithSalesListDto> GetByNumberWithSales(string number);
+    Task<string?> CreateCheckWithSales(CreateCheckWithSalesListDto dto);
 }
 
 public class CheckService : ICheckService
 {
     private readonly IRepository<Check> _checkRepo;
     private readonly CheckQueryProvider _queryProvider;
+    private readonly ISaleService _saleService;
+    private readonly IStoreProductService _storeProductService;
     private readonly IMapper _mapper;
 
-    public CheckService(CheckQueryProvider queryProvider, IMapper mapper, IRepository<Check> checkRepo)
+    public CheckService(CheckQueryProvider queryProvider, IMapper mapper, IRepository<Check> checkRepo, ISaleService saleService, IStoreProductService storeProductService)
     {
         _queryProvider = queryProvider;
         _mapper = mapper;
         _checkRepo = checkRepo;
+        _saleService = saleService;
+        _storeProductService = storeProductService;
     }
 
     public async Task<IEnumerable<CheckDto>> GetAll()
@@ -75,6 +82,39 @@ public class CheckService : ICheckService
         return _mapper.Map<IEnumerable<CheckWithSalesListDto>>(checks).First();
     }
 
+    public async Task<string?> CreateCheckWithSales(CreateCheckWithSalesListDto dto)
+    {
+        string? createdEntityId;
+        
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var checkNum = await _checkRepo.GetNextPrefixedStringId("CHK", _queryProvider.GetSeqNextVal);
+            var checkToCreate = new Check()
+            {
+                CheckNumber = checkNum,
+                CardNumber = dto.CardNumber,
+                IdEmployee = dto.IdEmployee,
+                PrintDate = dto.PrintDate,
+                SumTotal = dto.SumTotal, // calculated on client
+                VAT = dto.VAT // calculated on client
+            };
+            createdEntityId = await _checkRepo.InsertAsync<string>(checkToCreate, _queryProvider.CreateSingle);
+            if (createdEntityId == null) throw new ArgumentException("Failed to create a check.");
+            
+            foreach (var s in dto.Sales)
+            {
+                var sale = _mapper.Map<SaleDto>(s);
+                sale.CheckNumber = checkNum;
+                await _saleService.CreateSale(sale);
+                await _storeProductService.UpdateAmount(-s.ProductNumber, s.UPC);
+            }
+            
+            transaction.Complete();
+        }
+        
+        return createdEntityId;
+    }
+    
     private (DateTime start, DateTime end) ValidateNullDatetimeValues(DateTime? start, DateTime? end)
     {
         var validStart = start ?? DateTime.MinValue;

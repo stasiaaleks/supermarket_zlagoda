@@ -71,5 +71,14 @@ public class CheckController : ControllerBase
         return Ok(checkDto);
     }
     
+    [HttpPost]
+    [VerifyRole(EmployeeRoles.Cashier)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] CreateCheckWithSalesListDto dto)
+    {
+        var number = await _checkService.CreateCheckWithSales(dto);
+        if (number == null) return BadRequest();
+        return Created();
+    }
     
 }

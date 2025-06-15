@@ -8,7 +8,7 @@
 )
 VALUES (
            @CheckNumber,
-           @EmployeeId,
+           @IdEmployee,
            @CardNumber,
            @PrintDate,
            @SumTotal,
