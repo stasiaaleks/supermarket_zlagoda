@@ -9,6 +9,8 @@ namespace ShopApp.Services;
 public interface ISaleService
 {
     Task<IEnumerable<SaleDto>> GetAll();
+    Task<string> CreateSale(SaleDto dto);
+
     Task<ProductsSoldDto> GetProductTotalSoldByPeriod(DateTime start, DateTime end, string productUPC);
 }
 
@@ -28,6 +30,12 @@ public class SaleService : ISaleService
     public async Task<IEnumerable<SaleDto>> GetAll()
     {
         return await _saleRepo.GetAllAsync<SaleDto>(_queryProvider.GetAll);
+    }
+    public async Task<string> CreateSale(SaleDto dto)
+    {
+        var sale = _mapper.Map<Sale>(dto);
+        var newUpc = await _saleRepo.InsertAsync<string>(sale, _queryProvider.CreateSingle);
+        return newUpc;
     }
 
     public async Task<ProductsSoldDto> GetProductTotalSoldByPeriod(DateTime start, DateTime end, string productUPC)
