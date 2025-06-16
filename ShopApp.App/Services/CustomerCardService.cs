@@ -11,6 +11,9 @@ public interface ICustomerCardService
 {
     Task<IEnumerable<CustomerCardDto>> GetAll();
     Task<IEnumerable<CustomerCardDto>> Filter(CustomerCardSearchCriteria criteria);
+    Task<string> CreateCustomerCard(CustomerCardDto dto);
+    Task<string> UpdateByNum(CustomerCardDto dto);
+    Task<bool> DeleteByNum(string number);
 }
 
 public class CustomerCardService : ICustomerCardService
@@ -36,5 +39,25 @@ public class CustomerCardService : ICustomerCardService
         var query = _queryProvider.GetAll;
         var cards = await _cardRepo.FilterByPredicateAsync<CustomerCardDto>(query, criteria);
         return cards;
+    }
+    
+    public async Task<string> CreateCustomerCard(CustomerCardDto dto)
+    {
+        var card = _mapper.Map<CustomerCard>(dto);
+        var newNum = await _cardRepo.InsertAsync<string>(card, _queryProvider.CreateSingle);
+        return newNum;
+    }
+    
+    public async Task<string> UpdateByNum(CustomerCardDto dto)
+    {
+        var cardToUpdate = _mapper.Map<CustomerCard>(dto);
+        var updatedNum = await _cardRepo.UpdateAsync<string>(cardToUpdate, _queryProvider.UpdateByCardNum);
+        return updatedNum;
+    }
+
+    public async Task<bool> DeleteByNum(string number)
+    {
+        var rows = await _cardRepo.DeleteByIdAsync(_queryProvider.DeleteByCardNum, number);
+        return rows > 0;
     }
 }
