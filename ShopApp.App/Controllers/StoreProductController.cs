@@ -73,4 +73,34 @@ public class StoreProductController : ControllerBase
         var products = await _productService.GetFilteredRegular(searchCriteria);
         return Ok(products);
     }
+    
+    [HttpPost]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] StoreProductDto dto)
+    {
+        var id = await _productService.CreateStoreProduct(dto);
+        if (string.IsNullOrEmpty(id)) return BadRequest();
+        return Created();
+    }
+
+    [HttpPut]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Update([FromBody] StoreProductDto dto)
+    {
+        var id = await _productService.UpdateStoreProduct(dto);
+        if (string.IsNullOrEmpty(id)) return BadRequest();
+        return NoContent();
+    }
+
+    [HttpDelete("{upc}")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete(string upc)
+    {
+        var deleted = await _productService.DeleteStoreProduct(upc);
+        if (!deleted) return BadRequest();
+        return NoContent();
+    }
 }

@@ -3,11 +3,11 @@ namespace ShopApp.Data.QueriesAccess;
 public class StoreProductQueryProvider: IQueryByNamespaceProvider
 {
     private const string FolderName = "StoreProduct";
-    private const string GetAllQuery = "get_all";
-    private const string GetByUpcQuery = "get_by_upc";
-    private const string GetProductInfoByUpcQuery = "get_product_info_by_upc";
-    private const string GetAllPromotionalQuery = "get_all_promotional";
-    private const string GetAllRegularQuery = "get_all_regular";
+    private const string GetAllQuery = "get_all";//
+    private const string GetByUpcQuery = "get_by_upc"; //
+    private const string GetProductInfoByUpcQuery = "get_product_info_by_upc"; //
+    private const string GetAllPromotionalQuery = "get_all_promotional"; //
+    private const string GetAllRegularQuery = "get_all_regular";//
     private const string CreateSingleQuery = "create_single";
     private const string UpdateByUpcQuery = "update_by_upc";
     private const string DeleteByUpcQuery = "delete_by_upc";
