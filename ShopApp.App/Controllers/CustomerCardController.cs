@@ -19,7 +19,7 @@ public class CustomerCardController : ControllerBase
     }
 
     [HttpGet]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(IEnumerable<CustomerCardDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllCustomerCards()
     {
@@ -28,7 +28,7 @@ public class CustomerCardController : ControllerBase
     }
     
     [HttpGet("filter")]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(IEnumerable<CustomerCardDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FilterCategories([FromQuery] CustomerCardSearchCriteria searchCriteria)
     {

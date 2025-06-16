@@ -8,7 +8,7 @@ using ShopApp.Services.Auth;
 namespace ShopApp.Controllers;
 
 [ApiController]
-[Route("api/сategories")]
+[Route("api/categories")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -19,7 +19,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllCategories()
     {

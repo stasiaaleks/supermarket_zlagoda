@@ -12,6 +12,10 @@ import CategoriesPage from "./pages/CategoriesPage";
 import ChecksPage from "./pages/ChecksPage";
 import CardsPage from "./pages/CardsPage";
 import StoreProductPage from "./pages/StoreProductPage";
+import CashierChecksPage from "./pages/CashierChecksPage";
+import CashierStoreProductPage from "./pages/CashierStoreProductPage";
+import CashierProductsPage from "./pages/CashierProductsPage";
+import CashierCustomerPage from "./pages/CashierCustomerCardsPage";
 
 export default function App() {
     return (
@@ -80,7 +84,34 @@ export default function App() {
                     path="/cashier/checks"
                     element={
                         <PrivateRoute role="Cashier">
-                            <ChecksPage />
+                            <CashierChecksPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/cashier/products"
+                    element={
+                        <PrivateRoute role="Cashier">
+                            <CashierProductsPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/cashier/store-products"
+                    element={
+                        <PrivateRoute role="Cashier">
+                            <CashierStoreProductPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/cashier/clients"
+                    element={
+                        <PrivateRoute role="Cashier">
+                            <CashierCustomerPage />
                         </PrivateRoute>
                     }
                 />

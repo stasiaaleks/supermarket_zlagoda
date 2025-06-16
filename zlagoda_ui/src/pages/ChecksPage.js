@@ -27,41 +27,49 @@ export default function ChecksPage() {
     const fetchChecks = async () => {
         try {
             setError("");
-            let checksRes;
+            setTotalSum(null);
+            console.log("ЗАПИТ:", { selectedCashier, startDate, endDate });
 
-            if (startDate && endDate) {
-                if (selectedCashier) {
-                    // Фільтр за касиром і періодом
-                    checksRes = await axios.get(
-                        `http://localhost:5112/api/checks/cashiers/${selectedCashier}/sales`,
-                        {
-                            params: { start: startDate, end: endDate },
-                            withCredentials: true
-                        }
-                    );
-                } else {
-                    // Фільтр лише за періодом
-                    checksRes = await axios.get(
-                        `http://localhost:5112/api/checks/sales`,
-                        {
-                            params: { start: startDate, end: endDate },
-                            withCredentials: true
-                        }
-                    );
-                }
-                const checks = checksRes.data;
-                setChecks(checks.map(c => ({
-                    ...c,
-                    printDate: new Date(c.printDate),
-                })));
+            let checks = [];
+
+            if (selectedCashier) {
+                const res = await axios.get(
+                    `http://localhost:5112/api/checks/cashiers/${selectedCashier}/sales`,
+                    {
+                        params: {
+                            ...(startDate && { start: startDate }),
+                            ...(endDate && { end: endDate })
+                        },
+                        withCredentials: true
+                    }
+                );
+                checks = res.data;
+            } else if (startDate && endDate) {
+                const res = await axios.get(
+                    `http://localhost:5112/api/checks/sales`,
+                    {
+                        params: { start: startDate, end: endDate },
+                        withCredentials: true
+                    }
+                );
+                checks = res.data;
             } else {
-                // Без фільтрів — всі чеки
                 const res = await axios.get("http://localhost:5112/api/checks", { withCredentials: true });
-                setChecks(res.data);
+                checks = res.data;
             }
 
-            setTotalSum(null);
-        } catch {
+            // якщо є sales — зберігаємо їх одразу
+            const map = {};
+            for (const c of checks) {
+                if (c.sales) {
+                    map[c.checkNumber] = c.sales;
+                }
+            }
+
+            setChecks(checks.map(c => ({ ...c, printDate: new Date(c.printDate) })));
+            setCheckSalesMap(map);
+        } catch (e) {
+            console.error(e);
             setError("Помилка при завантаженні чеків");
         }
     };
@@ -197,7 +205,15 @@ export default function ChecksPage() {
                     <input type="date" className="form-control" value={endDate} onChange={e => setEndDate(e.target.value)} />
                 </div>
                 <div className="col-md-3 d-grid">
-                    <button className="btn btn-outline-dark" onClick={fetchChecks}>Застосувати фільтр</button>
+                    <button
+                        className="btn btn-outline-dark"
+                        onClick={() => {
+                            console.log("Натиснуто фільтр:", selectedCashier, startDate, endDate);
+                            fetchChecks();
+                        }}
+                    >
+                        Застосувати фільтр
+                    </button>
                 </div>
                 <div className="col-md-2 d-grid">
                     <button className="btn btn-outline-secondary" onClick={handlePrint}>Друк</button>
