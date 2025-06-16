@@ -34,4 +34,14 @@ public class SaleController : ControllerBase
         var totalSold = await _saleService.GetProductTotalSoldByPeriod(start, end, productUPC);
         return Ok(totalSold);
     }
+    
+    [HttpPost]
+    [VerifyRole(EmployeeRoles.Cashier)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] SaleDto dto)
+    {
+        var upc = await _saleService.CreateSale(dto);
+        if (string.IsNullOrEmpty(upc)) return BadRequest();
+        return Created();
+    }
 }

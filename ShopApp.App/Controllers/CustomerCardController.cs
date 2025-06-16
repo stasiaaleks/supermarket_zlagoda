@@ -35,4 +35,29 @@ public class CustomerCardController : ControllerBase
         var cards = await _cardService.Filter(searchCriteria);
         return Ok(cards);
     }
+    
+    public async Task<IActionResult> Create([FromBody] CustomerCardDto dto)
+    {
+        var number = await _cardService.CreateCustomerCard(dto);
+        if (number == null) return BadRequest();
+        return Created();
+    }
+    
+    [HttpDelete("{number}")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteByNum(string number)
+    {
+        await _cardService.DeleteByNum(number);
+        return NoContent();
+    }
+
+    [HttpPut]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateByNum(string number, [FromBody] CustomerCardDto dto)
+    {
+        await _cardService.UpdateByNum(dto);
+        return NoContent();
+    }
 }

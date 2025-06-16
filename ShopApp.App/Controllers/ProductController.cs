@@ -47,6 +47,29 @@ public class ProductController : ControllerBase
         var products = await _productService.Filter(searchCriteria);
         return Ok(products);
     }
-    
-    
+    [HttpPost]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] ProductDto dto)
+    {
+        var id = await _productService.CreateProduct(dto);
+        if (string.IsNullOrEmpty(id)) return BadRequest();
+        return Created();
+    }
+    public async Task<IActionResult> Update([FromBody] ProductDto dto)
+    {
+        var id = await _productService.UpdateById(dto);
+        if (string.IsNullOrEmpty(id)) return BadRequest();
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await _productService.DeleteById(id);
+        if (!deleted) return BadRequest();
+        return NoContent();
+    }
 }

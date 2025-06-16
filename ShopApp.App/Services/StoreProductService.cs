@@ -15,6 +15,9 @@ public interface IStoreProductService
     Task<IEnumerable<StoreProductDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria);
     Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria);
     Task<string> UpdateAmount(int delta, string productUpc);
+    Task<string> CreateStoreProduct(StoreProductDto dto);
+    Task<string> UpdateStoreProduct(StoreProductDto dto);
+    Task<bool> DeleteStoreProduct(string upc);
 }
 
 public class StoreProductService : IStoreProductService
@@ -61,7 +64,6 @@ public class StoreProductService : IStoreProductService
         var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
         return products;
     }
-    
     public async Task<string> UpdateAmount(int delta, string productUpc)
     {
         var product = await _productRepo.GetSingleAsync<StoreProduct>(_queryProvider.GetByUpc, new { UPC = productUpc });
@@ -75,7 +77,7 @@ public class StoreProductService : IStoreProductService
         
         return await _productRepo.UpdateAsync<string>(product, query);
     }
-
+    
     // consider adding SortableCriteria or similar refactoring
     // to make fetching of promotional/other products (and general filtering usage) cleaner
     public async Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria)
@@ -83,5 +85,24 @@ public class StoreProductService : IStoreProductService
         var query = _queryProvider.GetAllRegular;
         var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
         return products;
+    }
+    public async Task<string> CreateStoreProduct(StoreProductDto dto)
+    {
+        var entity = _mapper.Map<StoreProduct>(dto);
+        var result = await _productRepo.InsertAsync<string>(entity, _queryProvider.CreateSingle);
+        return result;
+    }
+
+    public async Task<string> UpdateStoreProduct(StoreProductDto dto)
+    {
+        var entity = _mapper.Map<StoreProduct>(dto);
+        var result = await _productRepo.UpdateAsync<string>(entity, _queryProvider.UpdateByUpc);
+        return result;
+    }
+
+    public async Task<bool> DeleteStoreProduct(string upc)
+    {
+        var rows = await _productRepo.DeleteByIdAsync(_queryProvider.DeleteByUpc, upc);
+        return rows > 0;
     }
 }
