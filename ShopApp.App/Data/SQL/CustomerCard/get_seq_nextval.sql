@@ -1,0 +1,1 @@
+SELECT NEXTVAL('public.card_number_card_seq');

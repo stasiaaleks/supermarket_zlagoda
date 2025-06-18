@@ -11,9 +11,9 @@
 )
 VALUES (
            @CardNumber,
-           @Surname,
-           @Name,
-           @Patronymic,
+           @CustSurname,
+           @CustName,
+           @CustPatronymic,
            @PhoneNumber,
            @City,
            @Street,

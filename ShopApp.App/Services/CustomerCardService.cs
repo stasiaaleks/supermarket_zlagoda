@@ -11,7 +11,7 @@ public interface ICustomerCardService
 {
     Task<IEnumerable<CustomerCardDto>> GetAll();
     Task<IEnumerable<CustomerCardDto>> Filter(CustomerCardSearchCriteria criteria);
-    Task<string> CreateCustomerCard(CustomerCardDto dto);
+    Task<string> CreateCustomerCard(CreateCustomerCardDto dto);
     Task<string> UpdateByNum(CustomerCardDto dto);
     Task<bool> DeleteByNum(string number);
 }
@@ -41,11 +41,13 @@ public class CustomerCardService : ICustomerCardService
         return cards;
     }
     
-    public async Task<string> CreateCustomerCard(CustomerCardDto dto)
+    public async Task<string> CreateCustomerCard(CreateCustomerCardDto dto)
     {
-        var card = _mapper.Map<CustomerCard>(dto);
-        var newNum = await _cardRepo.InsertAsync<string>(card, _queryProvider.CreateSingle);
-        return newNum;
+        var number = await _cardRepo.GetNextPrefixedStringId("CARD", _queryProvider.GetSeqNextVal);
+        var cardToCreate = _mapper.Map<CustomerCard>(dto);
+        cardToCreate.CardNumber = number;
+        var createdEntityId = await _cardRepo.InsertAsync<string>(cardToCreate, _queryProvider.CreateSingle);
+        return createdEntityId;
     }
     
     public async Task<string> UpdateByNum(CustomerCardDto dto)

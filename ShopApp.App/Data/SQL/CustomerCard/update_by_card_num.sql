@@ -1,8 +1,8 @@
 ﻿UPDATE customer_card
 SET
-    cust_surname = @Surname,
-    cust_name = @Name,
-    cust_patronymic = @Patronymic,
+    cust_surname = @CustSurname,
+    cust_name = @CustName,
+    cust_patronymic = @CustPatronymic,
     phone_number = @PhoneNumber,
     city = @City,
     street = @Street,

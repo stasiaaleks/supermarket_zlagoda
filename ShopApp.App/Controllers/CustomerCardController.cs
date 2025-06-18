@@ -9,7 +9,7 @@ namespace ShopApp.Controllers;
 
 [ApiController]
 [Route("api/cards")]
-public class CustomerCardController : ControllerBase
+public class  CustomerCardController : ControllerBase
 {
     private readonly ICustomerCardService _cardService;
 
@@ -39,17 +39,16 @@ public class CustomerCardController : ControllerBase
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] CustomerCardDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateCustomerCardDto dto)
     {
-        var number = await _cardService.CreateCustomerCard(dto);
-        if (number == null) return BadRequest();
+        await _cardService.CreateCustomerCard(dto);
         return Created();
     }
     
     [HttpDelete("{number}")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteByNum(string number)
+    public async Task<IActionResult> Delete(string number)
     {
         await _cardService.DeleteByNum(number);
         return NoContent();
@@ -58,7 +57,7 @@ public class CustomerCardController : ControllerBase
     [HttpPut]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> UpdateByNum(string number, [FromBody] CustomerCardDto dto)
+    public async Task<IActionResult> Update([FromBody] CustomerCardDto dto)
     {
         await _cardService.UpdateByNum(dto);
         return NoContent();
