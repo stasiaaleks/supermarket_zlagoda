@@ -35,7 +35,10 @@ public class CustomerCardController : ControllerBase
         var cards = await _cardService.Filter(searchCriteria);
         return Ok(cards);
     }
-    
+
+    [HttpPost]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CustomerCardDto dto)
     {
         var number = await _cardService.CreateCustomerCard(dto);
@@ -53,7 +56,7 @@ public class CustomerCardController : ControllerBase
     }
 
     [HttpPut]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateByNum(string number, [FromBody] CustomerCardDto dto)
     {

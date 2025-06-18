@@ -36,7 +36,8 @@ public class CheckController : ControllerBase
     }
     
     [HttpGet("cashiers/{cashierId}/sales")]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
+    [OnlySelf(nameof(cashierId), EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(IEnumerable<CheckWithSalesListDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetChecksWithSalesByCashier([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromRoute] string cashierId)
     {

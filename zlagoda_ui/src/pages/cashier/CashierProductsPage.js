@@ -15,7 +15,10 @@ export default function CashierProductsPage() {
     }, []);
 
     const fetchProducts = () => {
-        axios.get("http://localhost:5112/api/products", { withCredentials: true })
+        axios.get("http://localhost:5112/api/products/filter", {
+            params: { orderBy: "product_name" },
+            withCredentials: true
+        })
             .then((res) => setProducts(res.data))
             .catch(() => setError("Не вдалося завантажити продукти"));
     };

@@ -11,24 +11,30 @@ export default function CustomerCardsPage() {
     });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
-    const [sortAsc, setSortAsc] = useState(true);
     const printRef = useRef();
 
     useEffect(() => {
-        if (search.trim() === "") {
-            fetchAll();
-        }
-    }, [search]);
+        fetchSortedCards();
+    }, []);
 
-    const fetchAll = () => {
-        axios.get("http://localhost:5112/api/cards", { withCredentials: true })
+    const fetchSortedCards = () => {
+        axios.get("http://localhost:5112/api/cards/filter", {
+            params: { orderBy: "cust_surname" },
+            withCredentials: true
+        })
             .then(res => setCards(res.data))
             .catch(() => setError("Не вдалося завантажити клієнтів"));
     };
 
     const handleSearch = () => {
-        if (!search.trim()) return fetchAll();
-        axios.get(`http://localhost:5112/api/cards/filter?custSurname=${encodeURIComponent(search)}`, { withCredentials: true })
+        if (!search.trim()) return fetchSortedCards();
+        axios.get(`http://localhost:5112/api/cards/filter`, {
+            params: {
+                custSurname: search,
+                orderBy: "cust_surname"
+            },
+            withCredentials: true
+        })
             .then(res => setCards(res.data))
             .catch(() => setError("Не вдалося знайти клієнтів"));
     };
@@ -45,17 +51,20 @@ export default function CustomerCardsPage() {
     };
 
     const handleSubmit = () => {
-        const method = isEditing ? axios.put : axios.post;
-        const url = "http://localhost:5112/api/cards";
         const payload = { ...form };
-        if (isEditing) payload.cardNumber = selectedCard;
+
+        const method = isEditing ? axios.put : axios.post;
+        const url = isEditing
+            ? `http://localhost:5112/api/cards?number=${form.cardNumber}`
+            : "http://localhost:5112/api/cards";
 
         method(url, payload, { withCredentials: true })
             .then(() => {
-                fetchAll();
+                fetchSortedCards();
                 setForm({
                     custSurname: "", custName: "", custPatronymic: "",
-                    phoneNumber: "", city: "", street: "", zipCode: "", percent: 0
+                    phoneNumber: "", city: "", street: "", zipCode: "", percent: 0,
+                    cardNumber: "" // якщо дозволяєш користувачу вводити його вручну
                 });
                 setIsEditing(false);
                 setSelectedCard(null);
@@ -63,15 +72,6 @@ export default function CustomerCardsPage() {
             .catch(() => setError("Помилка збереження"));
     };
 
-    const handleSort = () => {
-        const sorted = [...cards].sort((a, b) => {
-            if (a.custSurname < b.custSurname) return sortAsc ? -1 : 1;
-            if (a.custSurname > b.custSurname) return sortAsc ? 1 : -1;
-            return 0;
-        });
-        setCards(sorted);
-        setSortAsc(!sortAsc);
-    };
 
     const handlePrint = () => {
         const printWindow = window.open("", "_blank", "width=800,height=600");
@@ -131,23 +131,25 @@ export default function CustomerCardsPage() {
             <div className="card p-3 mb-4">
                 <h5>{isEditing ? "Редагувати клієнта" : "Додати клієнта"}</h5>
                 <div className="row g-2">
-                    {[
-                        { name: "custSurname", placeholder: "Прізвище" },
-                        { name: "custName", placeholder: "Імʼя" },
-                        { name: "custPatronymic", placeholder: "По-батькові" },
-                        { name: "phoneNumber", placeholder: "Телефон" },
-                        { name: "city", placeholder: "Місто" },
-                        { name: "street", placeholder: "Вулиця" },
-                        { name: "zipCode", placeholder: "Індекс" },
-                        { name: "percent", placeholder: "Знижка (%)" }
-                    ].map(({ name, placeholder }) => (
+                    {[ "custSurname", "custName", "custPatronymic", "phoneNumber", "city", "street", "zipCode", "percent" ].map(name => (
                         <div className="col-md-3" key={name}>
                             <input
                                 name={name}
                                 value={form[name]}
                                 onChange={handleFormChange}
                                 className="form-control"
-                                placeholder={placeholder}
+                                placeholder={
+                                    {
+                                        custSurname: "Прізвище",
+                                        custName: "Імʼя",
+                                        custPatronymic: "По-батькові",
+                                        phoneNumber: "Телефон",
+                                        city: "Місто",
+                                        street: "Вулиця",
+                                        zipCode: "Індекс",
+                                        percent: "Знижка (%)"
+                                    }[name]
+                                }
                             />
                         </div>
                     ))}
@@ -163,9 +165,7 @@ export default function CustomerCardsPage() {
                 <table className="table table-bordered table-striped">
                     <thead>
                     <tr>
-                        <th onClick={handleSort} style={{ cursor: "pointer" }}>
-                            Прізвище {sortAsc ? "↑" : "↓"}
-                        </th>
+                        <th>Прізвище</th>
                         <th>Імʼя</th>
                         <th>По-батькові</th>
                         <th>Телефон</th>

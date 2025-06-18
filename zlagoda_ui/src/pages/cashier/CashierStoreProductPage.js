@@ -8,20 +8,26 @@ export default function CashierStoreProductsPage() {
     const [promoFilter, setPromoFilter] = useState("");
     const [error, setError] = useState("");
     const printRef = useRef();
+    const [upcSearch, setUpcSearch] = useState("");
 
     useEffect(() => {
-        axios.get("http://localhost:5112/api/store-products", { withCredentials: true })
+        axios.get("http://localhost:5112/api/store-products/filter", {
+            params: { SortBy: "ProductName" },
+            withCredentials: true
+        })
             .then((res) => setProducts(res.data))
             .catch(() => setError("Не вдалося завантажити товари"));
     }, []);
 
     const filteredProducts = products.filter(p => {
-        const matchesSearch = p.productName.toLowerCase().includes(search.toLowerCase());
+        const matchesName = p.productName.toLowerCase().includes(search.toLowerCase());
+        const matchesUpc = p.upc.toLowerCase().includes(upcSearch.toLowerCase());
         const matchesPromo = promoFilter === ""
             || (promoFilter === "promo" && p.promotionalProduct)
             || (promoFilter === "regular" && !p.promotionalProduct);
-        return matchesSearch && matchesPromo;
+        return matchesName && matchesUpc && matchesPromo;
     });
+
 
     const handlePrint = () => {
         const printWindow = window.open("", "_blank", "width=800,height=600");
@@ -62,14 +68,41 @@ export default function CashierStoreProductsPage() {
             {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="row mb-3">
-                <div className="col-md-4">
-                    <input
-                        className="form-control"
-                        type="text"
-                        placeholder="Пошук за назвою"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                <div className="row mb-3 g-3">
+                    <div className="col-md-4">
+                        <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Пошук за назвою"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-4">
+                        <input
+                            className="form-control"
+                            type="text"
+                            placeholder="Пошук за UPC"
+                            value={upcSearch}
+                            onChange={(e) => setUpcSearch(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-md-2">
+                        <select
+                            className="form-select"
+                            value={promoFilter}
+                            onChange={(e) => setPromoFilter(e.target.value)}
+                        >
+                            <option value="">Усі товари</option>
+                            <option value="promo">Акційні</option>
+                            <option value="regular">Звичайні</option>
+                        </select>
+                    </div>
+                    <div className="col-md-2 text-end">
+                        <button className="btn btn-outline-primary w-100" onClick={handlePrint}>
+                            Друк звіту
+                        </button>
+                    </div>
                 </div>
                 <div className="col-md-4">
                     <select

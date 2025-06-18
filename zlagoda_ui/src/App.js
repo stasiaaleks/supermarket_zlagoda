@@ -1,21 +1,21 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import LoginPage from "./pages/LoginPage";
-import DashboardManager from "./pages/DashboardManager";
-import DashboardCashier from "./pages/DashboardCashier";
+import LoginPage from "./pages/shared/LoginPage";
+import DashboardManager from "./pages/manager/DashboardManager";
+import DashboardCashier from "./pages/cashier/DashboardCashier";
 import PrivateRoute from "./components/PrivateRoute";
-import NotFoundPage from "./pages/NotFoundPage";
-import ProductsPage from "./pages/ProductsPage";
-import EmployeesPage from "./pages/EmployeesPage";
-import CategoriesPage from "./pages/CategoriesPage";
-import ChecksPage from "./pages/ChecksPage";
-import CardsPage from "./pages/CardsPage";
-import StoreProductPage from "./pages/StoreProductPage";
-import CashierChecksPage from "./pages/CashierChecksPage";
-import CashierStoreProductPage from "./pages/CashierStoreProductPage";
-import CashierProductsPage from "./pages/CashierProductsPage";
-import CashierCustomerPage from "./pages/CashierCustomerCardsPage";
+import NotFoundPage from "./pages/shared/NotFoundPage";
+import ProductsPage from "./pages/manager/ProductsPage";
+import EmployeesPage from "./pages/manager/EmployeesPage";
+import CategoriesPage from "./pages/manager/CategoriesPage";
+import ChecksPage from "./pages/manager/ChecksPage";
+import CardsPage from "./pages/manager/CardsPage";
+import StoreProductPage from "./pages/manager/StoreProductPage";
+import CashierChecksPage from "./pages/cashier/CashierChecksPage";
+import CashierStoreProductPage from "./pages/cashier/CashierStoreProductPage";
+import CashierProductsPage from "./pages/cashier/CashierProductsPage";
+import CashierCustomerPage from "./pages/cashier/CashierCustomerCardsPage";
 
 export default function App() {
     return (

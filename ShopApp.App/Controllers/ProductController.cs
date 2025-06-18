@@ -56,6 +56,10 @@ public class ProductController : ControllerBase
         if (string.IsNullOrEmpty(id)) return BadRequest();
         return Created();
     }
+
+    [HttpPut]
+    [VerifyRole(EmployeeRoles.Manager)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Update([FromBody] ProductDto dto)
     {
         var id = await _productService.UpdateById(dto);

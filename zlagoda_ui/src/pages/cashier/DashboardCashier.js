@@ -58,7 +58,6 @@ export default function DashboardCashier() {
                     { label: "Товари в магазині", to: "/cashier/store-products" },
                     { label: "Клієнти", to: "/cashier/clients" },
                     { label: "Мої чеки", to: "/cashier/checks" },
-                    { label: "Мої продажі / Статистика", to: "/cashier/sales" },
                 ].map(({label, to}) => (
                     <div className="col-md-4" key={label}>
                         <Link to={to} className="text-decoration-none">
