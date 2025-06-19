@@ -16,7 +16,7 @@ public interface IRepository<T> where T : class
     Task<IEnumerable<TResult>> GetAllAsync<TResult>(string queryPath, object? parameters = null);
     Task<TResult> InsertAsync<TResult>(T entity, string queryPath, object? parameters = null);
     Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null);
-    Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null);
+    Task<int> DeleteAsync(string queryPath, object? parameters = null);
     Task<int> DeleteByIdAsync(string queryPath, string id);
     Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null);
     Task<string> GetNextPrefixedStringId(string prefix, string sequenceQueryPath);
@@ -131,13 +131,11 @@ public class Repository<T> : IRepository<T> where T : class
         return await connection.ExecuteScalarAsync<TResult>(query, totalQueryParameters);
     }
 
-    public async Task<int> DeleteAsync(T entity, string queryPath, object? parameters = null)
+    public async Task<int> DeleteAsync(string queryPath, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();
         var query = _sqlQueryRegistry.Load(queryPath);
-
-        var totalQueryParameters = MergeEntityParameters(parameters, entity);
-        return await connection.ExecuteAsync(query, totalQueryParameters);
+        return await connection.ExecuteAsync(query, parameters);
     }
 
     public async Task<int> DeleteByIdAsync(string queryPath, string id)
@@ -147,7 +145,6 @@ public class Repository<T> : IRepository<T> where T : class
         
         return await connection.ExecuteAsync(query, new { Id = id });
     }
-
     public async Task<TResult> ExecuteScalarAsync<TResult>(string queryPath, object? parameters = null)
     {
         using var connection = await _dbConnectionProvider.Connect();

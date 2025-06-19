@@ -49,7 +49,7 @@ public class CategoryController : ControllerBase
     [HttpDelete("{number}")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteByNum(string number)
+    public async Task<IActionResult> DeleteByNum(int number)
     {
         var deleted = await _categoryService.DeleteByNum(number);
         if (!deleted) return BadRequest();
