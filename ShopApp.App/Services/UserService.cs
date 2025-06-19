@@ -1,4 +1,5 @@
 using ShopApp.DAL.Repository;
+using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
 using ShopApp.Data.QueriesAccess;
 using ShopApp.Services.Auth;
@@ -12,6 +13,8 @@ public interface IUserService
     Task<User> GetByUsername(string username);
     Task<User> GetByEmployeeId(string employeeId);
     Task<int> CreateUser(string username, string password, string idEmployee);
+    Task<int> UpdateById(User user);
+    Task<User?> UpdatePasswordByUsername(string username, string password);
 }
 
 public class UserService: IUserService
@@ -70,5 +73,25 @@ public class UserService: IUserService
         if (newUser == null) throw new ArgumentException($"Failed to create an employee {username}");
 
         return newUser.UserId;
+    }
+
+    public async Task<int> UpdateById(User user)
+    {
+        var query = _queryProvider.UpdateById;
+        return await _userRepo.UpdateAsync<int>(user, query);
+    }
+    
+    
+    public async Task<User?> UpdatePasswordByUsername(string username, string password)
+    {
+        var user = await GetByUsername(username);
+        if (user == null)
+            throw new KeyNotFoundException($"User with username '{username}' not found.");
+        var (hash, salt) = _passwordHasher.HashPassword(password);
+        user.PasswordHash = hash;
+        user.PasswordSalt = salt;
+
+        var id = await UpdateById(user);
+        return id != null ? user : null;
     }
 }

@@ -11,7 +11,7 @@ public interface IAuthService
     Task<User?> Authenticate(string username, string password);
     Task<User> RegisterUserWithEmployee(RegisterDto dto);
     Task<User> RegisterForExistingEmployee(CreateUserDto dto);
-    Task<bool> ChangePassword(string username);
+    Task<User?> ChangePassword(LoginDto dto);
 }
 
 
@@ -65,8 +65,8 @@ public class AuthService: IAuthService
         return await _userService.GetById(newUserId);
     }
 
-    public Task<bool> ChangePassword(string username)
+    public async Task<User?> ChangePassword(LoginDto dto)
     {
-        throw new NotImplementedException();
+        return await _userService.UpdatePasswordByUsername(dto.Username, dto.Password);
     }
 }

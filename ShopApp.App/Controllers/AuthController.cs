@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopApp.Data.DTO;
 using ShopApp.Data.Entities;
@@ -54,6 +55,29 @@ public class AuthController: ControllerBase
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return Ok(new { message = "User logged out successfully." });
+    }
+    
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ChangePassword([FromBody] LoginDto dto)
+    {
+        var currentUsername = User.Identity?.Name;
+    
+        if (!VerifyPasswordOwnership(currentUsername, dto.Username))
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "You can only change your own password" });
+        
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        var updatedUser = await _authService.ChangePassword(dto);
+        if (updatedUser == null) return BadRequest(new { message = "Failed changing password" });
+    
+        await LoginUser(updatedUser);
+        return Ok(new { message = "Password changed successfully. User logged in" });
+    }
+
+    private bool VerifyPasswordOwnership(string? currentUsername, string incomingUsername)
+    {
+        return currentUsername != null && string.Equals(currentUsername, incomingUsername, StringComparison.OrdinalIgnoreCase);
     }
 
 

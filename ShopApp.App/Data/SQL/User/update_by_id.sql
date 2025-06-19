@@ -1,12 +1,6 @@
-﻿UPDATE employee
-SET surname = @Surname,
-    name = @Name,
-    patronymic = @Patronymic,
-    role = @Role,
-    salary = @Salary,
-    date_of_birth = @Date_of_birth,
-    phone_number = @Phone_number,
-    city = @City,
-    street = @Street,
-    zip_code = @Zip_code
-WHERE id_employee = @Id
+﻿UPDATE "user"
+SET password_salt = @PasswordSalt,
+    password_hash = @PasswordHash,
+    username = @Username,
+    id_employee = @IdEmployee
+WHERE user_id = @UserId
