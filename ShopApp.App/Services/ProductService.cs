@@ -11,8 +11,8 @@ public interface IProductService
     Task<IEnumerable<ProductDto>> GetAll();
     Task<IEnumerable<ProductDto>> Filter(ProductSearchCriteria criteria);
     Task<ProductDto> GetById(string id);
-    Task<string> CreateProduct(ProductDto dto);
-    Task<string> UpdateById(ProductDto dto);
+    Task<string> CreateProduct(CreateProductDto dto);
+    Task<string> UpdateById(UpdateProductDto dto);
     Task<bool> DeleteById(string number);
 }
 
@@ -31,8 +31,7 @@ public class ProductService : IProductService
     
     public async Task<IEnumerable<ProductDto>> GetAll()
     {
-        var products = await _productRepo.GetAllAsync(_queryProvider.GetAll);
-        return _mapper.Map<IEnumerable<ProductDto>>(products);
+        return await _productRepo.GetAllAsync<ProductDto>(_queryProvider.GetAll);
     }
 
     public async Task<IEnumerable<ProductDto>> Filter(ProductSearchCriteria criteria)
@@ -47,14 +46,14 @@ public class ProductService : IProductService
         var product = await _productRepo.GetByIdAsync(_queryProvider.GetById, id);
         return _mapper.Map<ProductDto>(product);
     }
-    public async Task<string> CreateProduct(ProductDto dto)
+    public async Task<string> CreateProduct(CreateProductDto dto)
     {
         var product = _mapper.Map<ProductDto>(dto);
         var newId = await _productRepo.InsertAsync<string>(product, _queryProvider.CreateSingle);
         return newId;
     }
     
-    public async Task<string> UpdateById(ProductDto dto)
+    public async Task<string> UpdateById(UpdateProductDto dto)
     {
         var productToUpdate = _mapper.Map<ProductDto>(dto);
         var updatedId = await _productRepo.UpdateAsync<string>(productToUpdate, _queryProvider.UpdateById);

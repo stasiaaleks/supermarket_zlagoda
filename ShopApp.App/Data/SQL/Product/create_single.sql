@@ -1,3 +1,3 @@
-﻿INSERT INTO product (category_number, product_name, characteristics)
-VALUES (@CategoryNumber, @ProductName, @Characteristics)
+﻿INSERT INTO product (category_number, product_name, characteristics, manufacturer)
+VALUES (@CategoryNumber, @ProductName, @Characteristics, @Manufacturer)
 RETURNING id_product;

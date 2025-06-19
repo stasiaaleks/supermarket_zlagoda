@@ -50,7 +50,7 @@ public class ProductController : ControllerBase
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] ProductDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateProductDto dto)
     {
         var id = await _productService.CreateProduct(dto);
         if (string.IsNullOrEmpty(id)) return BadRequest();
@@ -60,7 +60,7 @@ public class ProductController : ControllerBase
     [HttpPut]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Update([FromBody] ProductDto dto)
+    public async Task<IActionResult> Update([FromBody] UpdateProductDto dto)
     {
         var id = await _productService.UpdateById(dto);
         if (string.IsNullOrEmpty(id)) return BadRequest();
