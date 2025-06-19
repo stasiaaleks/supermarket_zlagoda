@@ -32,7 +32,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByNum(int number)
     {
-        var categories = await _categoryService.GetByNum(number);
+        var categories = await _categoryService.GetAllByNum(number);
         return Ok(categories);
     }
     

@@ -10,7 +10,7 @@ namespace ShopApp.Services;
 public interface ICategoryService
 {
     Task<IEnumerable<CategoryDto>> GetAll();
-    Task<IEnumerable<CategoryDto>> GetByNum(int number);
+    Task<IEnumerable<CategoryDto>> GetAllByNum(int number);
     Task<int> CreateCategory(CreateCategoryDto dto);
     Task<int> UpdateByNum(CategoryDto dto);
     Task<bool> DeleteByNum(int number);
@@ -43,7 +43,7 @@ public class CategoryService : ICategoryService
         var categories = await _categoryRepo.FilterByPredicateAsync<CategoryDto>(query, criteria);
         return categories;
     }
-    public async Task<IEnumerable<CategoryDto>> GetByNum(int number)
+    public async Task<IEnumerable<CategoryDto>> GetAllByNum(int number)
     {
         var categories = await _categoryRepo.GetAllAsync<Category>(
             _queryProvider.GetByNum,
@@ -68,6 +68,10 @@ public class CategoryService : ICategoryService
 
     public async Task<bool> DeleteByNum(int number)
     {
+        var numberParams = new { CategoryNumber = number };
+        var existingEntity = await _categoryRepo.GetSingleAsync(_queryProvider.GetByNum, numberParams);
+        if (existingEntity == null) throw new ArgumentException($"No category with number {number} was found.");
+        
         var rows = await _categoryRepo.DeleteAsync(_queryProvider.DeleteByNum, new { CategoryNumber = number});
         return rows > 0;
     }
