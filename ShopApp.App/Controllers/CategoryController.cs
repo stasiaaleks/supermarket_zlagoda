@@ -51,7 +51,8 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteByNum(string number)
     {
-        await _categoryService.DeleteByNum(number);
+        var deleted = await _categoryService.DeleteByNum(number);
+        if (!deleted) return BadRequest();
         return NoContent();
     }
 
