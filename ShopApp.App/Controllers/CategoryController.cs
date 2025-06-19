@@ -32,7 +32,7 @@ public class CategoryController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByNum(int number)
     {
-        var categories = await _categoryService.GetByNum(number);
+        var categories = await _categoryService.GetAllByNum(number);
         return Ok(categories);
     }
     
@@ -49,7 +49,7 @@ public class CategoryController : ControllerBase
     [HttpDelete("{number}")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteByNum(string number)
+    public async Task<IActionResult> DeleteByNum(int number)
     {
         var deleted = await _categoryService.DeleteByNum(number);
         if (!deleted) return BadRequest();

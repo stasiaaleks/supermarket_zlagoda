@@ -10,10 +10,10 @@ namespace ShopApp.Services;
 public interface ICategoryService
 {
     Task<IEnumerable<CategoryDto>> GetAll();
-    Task<IEnumerable<CategoryDto>> GetByNum(int number);
-    Task<string> CreateCategory(CreateCategoryDto dto);
-    Task<string> UpdateByNum(CategoryDto dto);
-    Task<bool> DeleteByNum(string number);
+    Task<IEnumerable<CategoryDto>> GetAllByNum(int number);
+    Task<int> CreateCategory(CreateCategoryDto dto);
+    Task<int> UpdateByNum(CategoryDto dto);
+    Task<bool> DeleteByNum(int number);
     
     Task<IEnumerable<CategoryDto>> Filter(CategorySearchCriteria criteria);
 }
@@ -43,7 +43,7 @@ public class CategoryService : ICategoryService
         var categories = await _categoryRepo.FilterByPredicateAsync<CategoryDto>(query, criteria);
         return categories;
     }
-    public async Task<IEnumerable<CategoryDto>> GetByNum(int number)
+    public async Task<IEnumerable<CategoryDto>> GetAllByNum(int number)
     {
         var categories = await _categoryRepo.GetAllAsync<Category>(
             _queryProvider.GetByNum,
@@ -52,23 +52,27 @@ public class CategoryService : ICategoryService
         return _mapper.Map<IEnumerable<CategoryDto>>(categories);
     }
 
-    public async Task<string> CreateCategory(CreateCategoryDto dto)
+    public async Task<int> CreateCategory(CreateCategoryDto dto)
     {
         var category = _mapper.Map<Category>(dto);
-        var newId = await _categoryRepo.InsertAsync<string>(category, _queryProvider.CreateSingle);
+        var newId = await _categoryRepo.InsertAsync<int>(category, _queryProvider.CreateSingle);
         return newId;
     }
     
-    public async Task<string> UpdateByNum(CategoryDto dto)
+    public async Task<int> UpdateByNum(CategoryDto dto)
     {
         var categoryToUpdate = _mapper.Map<Category>(dto);
-        var updatedId = await _categoryRepo.UpdateAsync<string>(categoryToUpdate, _queryProvider.UpdateByNum);
+        var updatedId = await _categoryRepo.UpdateAsync<int>(categoryToUpdate, _queryProvider.UpdateByNum);
         return updatedId;
     }
 
-    public async Task<bool> DeleteByNum(string number)
+    public async Task<bool> DeleteByNum(int number)
     {
-        var rows = await _categoryRepo.DeleteByIdAsync(_queryProvider.DeleteByNum, number);
+        var numberParams = new { CategoryNumber = number };
+        var existingEntity = await _categoryRepo.GetSingleAsync(_queryProvider.GetByNum, numberParams);
+        if (existingEntity == null) throw new ArgumentException($"No category with number {number} was found.");
+        
+        var rows = await _categoryRepo.DeleteAsync(_queryProvider.DeleteByNum, new { CategoryNumber = number});
         return rows > 0;
     }
 
