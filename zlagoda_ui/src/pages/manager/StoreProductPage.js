@@ -88,8 +88,9 @@ export default function StoreProductsPage() {
                     <h2 className="fw-bold mb-0">Товари в магазині</h2>
                     <small className="text-muted">Список усіх товарів, наявних у магазині</small>
                 </div>
-                <div>
+                <div className="d-flex gap-2">
                     <button onClick={handlePrint} className="btn btn-outline-dark">Друк звіту</button>
+                    <button onClick={() => window.location.href = "/manager"} className="btn btn-outline-secondary">Головне меню</button>
                 </div>
             </div>
 

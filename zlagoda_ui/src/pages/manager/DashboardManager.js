@@ -62,7 +62,6 @@ export default function DashboardManager() {
                         { label: "Картки клієнтів", to: "/manager/cards" },
                         { label: "Товари в магазині", to: "/manager/store-products" },
                         { label: "Чеки", to: "/manager/checks" },
-                        { label: "Продажі / Статистика", to: "/manager/sales" },
                     ].map(({ label, to }) => (
                         <div className="col-md-4" key={label}>
                             <Link to={to} className="text-decoration-none">

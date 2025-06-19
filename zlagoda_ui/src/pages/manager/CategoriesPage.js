@@ -15,7 +15,7 @@ export default function CategoriesPage() {
 
     const fetchCategories = async () => {
         try {
-            const res = await axios.get("http://localhost:5112/api/сategories/filter", {
+            const res = await axios.get("http://localhost:5112/api/categories/filter", {
                 withCredentials: true
             });
             setCategories(res.data);
@@ -29,7 +29,7 @@ export default function CategoriesPage() {
             const params = {};
             if (filter.categoryName) params.CategoryName = filter.categoryName;
 
-            const res = await axios.get("http://localhost:5112/api/сategories/filter", {
+            const res = await axios.get("http://localhost:5112/api/categories/filter", {
                 params,
                 withCredentials: true,
             });
@@ -51,7 +51,7 @@ export default function CategoriesPage() {
     const handleDelete = async (id) => {
         if (!window.confirm("Ви впевнені, що хочете видалити цю категорію?")) return;
         try {
-            await axios.delete(`http://localhost:5112/api/сategories/${id}`, { withCredentials: true });
+            await axios.delete(`http://localhost:5112/api/categories/${id}`, { withCredentials: true });
             fetchCategories();
         } catch (err) {
             setError("Помилка при видаленні");
@@ -62,9 +62,9 @@ export default function CategoriesPage() {
         e.preventDefault();
         try {
             if (editMode) {
-                await axios.put("http://localhost:5112/api/сategories", form, { withCredentials: true });
+                await axios.put("http://localhost:5112/api/categories", form, { withCredentials: true });
             } else {
-                await axios.post("http://localhost:5112/api/сategories", form, { withCredentials: true });
+                await axios.post("http://localhost:5112/api/categories", form, { withCredentials: true });
             }
             setForm({ categoryNumber: "", categoryName: "" });
             setEditMode(false);
@@ -112,7 +112,10 @@ export default function CategoriesPage() {
                         <h2 className="fw-bold mb-0">Категорії товарів</h2>
                         <small className="text-muted">Керування категоріями супермаркету</small>
                     </div>
-                    <button onClick={handlePrint} className="btn btn-outline-dark">Друк звіту</button>
+                    <div className="d-flex gap-2">
+                        <button onClick={handlePrint} className="btn btn-outline-dark">Друк звіту</button>
+                        <button onClick={() => window.location.href = "/manager"} className="btn btn-outline-secondary">Головне меню</button>
+                    </div>
                 </div>
 
                 {error && <div className="alert alert-danger">{error}</div>}
@@ -136,14 +139,21 @@ export default function CategoriesPage() {
                 </form>
 
                 <form onSubmit={handleSubmit} className="row g-3 mb-4">
-                    <div className="col-md-4">
-                        <input name="categoryNumber" value={form.categoryNumber} onChange={handleChange} className="form-control" placeholder="№ категорії" required />
+                    <div className="col-md-6">
+                        <input
+                            name="categoryName"
+                            value={form.categoryName}
+                            onChange={handleChange}
+                            className="form-control"
+                            placeholder="Назва категорії"
+                            required
+                        />
                     </div>
-                    <div className="col-md-4">
-                        <input name="categoryName" value={form.categoryName} onChange={handleChange} className="form-control" placeholder="Назва категорії" required />
-                    </div>
+
                     <div className="col-md-2">
-                        <button type="submit" className="btn btn-success w-100">{editMode ? "Зберегти" : "Додати"}</button>
+                        <button type="submit" className="btn btn-success w-100">
+                            {editMode ? "Зберегти" : "Додати"}
+                        </button>
                     </div>
                 </form>
 

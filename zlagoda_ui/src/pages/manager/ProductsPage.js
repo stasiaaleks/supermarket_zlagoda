@@ -11,7 +11,7 @@ export default function ProductsPage() {
     const [categoryOptions, setCategoryOptions] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:5112/api/сategories", { withCredentials: true })
+        axios.get("http://localhost:5112/api/categories", { withCredentials: true })
             .then(res => setCategoryOptions(res.data))
             .catch(() => setError("Не вдалося завантажити список категорій"));
     }, []);
@@ -124,10 +124,12 @@ export default function ProductsPage() {
                         <h2 className="fw-bold mb-0">Товари</h2>
                         <small className="text-muted">Керування товарами супермаркету</small>
                     </div>
-                    <div>
+                    <div className="d-flex gap-2">
                         <button onClick={handlePrint} className="btn btn-outline-dark">Друк звіту</button>
+                        <button onClick={() => window.location.href = "/manager"} className="btn btn-outline-secondary">Головне меню</button>
                     </div>
                 </div>
+
 
                 {error && <div className="alert alert-danger">{error}</div>}
 

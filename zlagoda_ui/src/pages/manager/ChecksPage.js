@@ -181,7 +181,16 @@ export default function ChecksPage() {
 
     return (
         <div className="container py-4">
-            <h2 className="mb-4">Перегляд чеків</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="mb-0">Перегляд чеків</h2>
+                <button
+                    className="btn btn-outline-primary"
+                    onClick={() => window.location.href = "/manager"}
+                >
+                    Головне меню
+                </button>
+            </div>
+
             {error && <div className="alert alert-danger">{error}</div>}
 
             <div className="row g-3 mb-4 align-items-end">

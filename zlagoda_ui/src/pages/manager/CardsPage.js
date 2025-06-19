@@ -74,8 +74,9 @@ export default function CardsPage() {
                     <h2 className="fw-bold mb-0">Клієнти</h2>
                     <small className="text-muted">Картки постійних клієнтів супермаркету</small>
                 </div>
-                <div>
+                <div className="d-flex gap-2">
                     <button onClick={handlePrint} className="btn btn-outline-dark">Друк звіту</button>
+                    <button onClick={() => window.location.href = "/manager"} className="btn btn-outline-secondary">Головне меню</button>
                 </div>
             </div>
 
