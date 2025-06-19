@@ -44,6 +44,14 @@ export default function DashboardCashier() {
                         <p className="mb-1"><strong>Дата початку роботи:</strong> {formatDate(user.dateOfStart)}</p>
                         <p className="mb-1"><strong>Дата народження:</strong> {formatDate(user.dateOfBirth)}</p>
                         <p className="mb-0"><strong>Адреса:</strong> {user.city}, {user.street}, {user.zipCode}</p>
+                        <div className="d-grid mt-3">
+                            <button
+                                className="btn btn-outline-secondary"
+                                onClick={() => navigate("/change-password")}
+                            >
+                                Змінити пароль
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
