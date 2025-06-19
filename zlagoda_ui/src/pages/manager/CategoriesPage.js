@@ -48,13 +48,22 @@ export default function CategoriesPage() {
         setEditMode(true);
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (number) => {
         if (!window.confirm("Ви впевнені, що хочете видалити цю категорію?")) return;
         try {
-            await axios.delete(`http://localhost:5112/api/categories/${id}`, { withCredentials: true });
+            await axios.delete(`http://localhost:5112/api/categories/${encodeURIComponent(number)}`, {
+                withCredentials: true
+            });
             fetchCategories();
         } catch (err) {
-            setError("Помилка при видаленні");
+            console.error(err); // <-- додай це для діагностики
+            if (err.response?.status === 500) {
+                setError("Серверна помилка при видаленні. Можливо, категорія пов'язана з товарами.");
+            } else if (err.response?.status === 404) {
+                setError("Категорію не знайдено (можливо, вже видалена).");
+            } else {
+                setError("Помилка при видаленні категорії.");
+            }
         }
     };
 
@@ -171,7 +180,9 @@ export default function CategoriesPage() {
                                 <td>{c.categoryName}</td>
                                 <td>
                                     <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(c)}>Редагувати</button>
-                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(c.categoryNumber)}>Видалити</button>
+                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(String(c.categoryNumber))}>
+                                        Видалити
+                                    </button>
                                 </td>
                             </tr>
                         ))}

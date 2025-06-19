@@ -4,7 +4,12 @@ import axios from "axios";
 export default function ProductsPage() {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState("");
-    const [form, setForm] = useState({ categoryName: "", productName: "", characteristics: "" });
+    const [form, setForm] = useState({
+        categoryNumber: "",
+        productName: "",
+        manufacturer: "",
+        characteristics: ""
+    });
     const [editMode, setEditMode] = useState(false);
     const printRef = useRef();
     const [filter, setFilter] = useState({ productName: "", categoryName: "" });
@@ -24,7 +29,7 @@ export default function ProductsPage() {
 
     const fetchProducts = async () => {
         try {
-            const res = await axios.get("http://localhost:5112/api/products", { withCredentials: true });
+            const res = await axios.get("http://localhost:5112/api/products/filter", { withCredentials: true });
             setProducts(res.data);
         } catch (err) {
             setError("Помилка при завантаженні товарів");
@@ -134,20 +139,55 @@ export default function ProductsPage() {
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="row g-3 mb-4">
-                    <div className="col-md-3">
-                        <input name="categoryNumber" value={form.categoryNumber} onChange={handleChange} className="form-control" placeholder="№ категорії" required />
-                    </div>
-                    <div className="col-md-3">
-                        <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Назва товару" required />
-                    </div>
-                    <div className="col-md-3">
-                        <input name="characteristics" value={form.characteristics} onChange={handleChange} className="form-control" placeholder="Характеристики" />
+                    <div className="col-md-2">
+                        <select
+                            name="categoryNumber"
+                            value={form.categoryNumber || ""}
+                            onChange={handleChange}
+                            className="form-select"
+                            required
+                        >
+                            <option value="">Оберіть категорію</option>
+                            {categoryOptions.map((cat) => (
+                                <option key={cat.categoryNumber} value={cat.categoryNumber}>
+                                    {cat.categoryName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className="col-md-2">
-                        <button type="submit" className="btn btn-success w-100" disabled title="Збереження ще не підтримується">
+                        <input
+                            name="productName"
+                            value={form.productName}
+                            onChange={handleChange}
+                            className="form-control"
+                            placeholder="Назва товару"
+                            required
+                        />
+                    </div>
+                    <div className="col-md-2">
+                        <input
+                            name="manufacturer"
+                            value={form.manufacturer || ""}
+                            onChange={handleChange}
+                            className="form-control"
+                            placeholder="Виробник"
+                            required
+                        />
+                    </div>
+                    <div className="col-md-2">
+                        <input
+                            name="characteristics"
+                            value={form.characteristics}
+                            onChange={handleChange}
+                            className="form-control"
+                            placeholder="Характеристики"
+                        />
+                    </div>
+                    <div className="col-md-3 d-flex align-items-end">
+                        <button type="submit" className="btn btn-success w-100">
                             {editMode ? "Зберегти" : "Додати"}
                         </button>
-
                     </div>
                 </form>
 
@@ -206,8 +246,9 @@ export default function ProductsPage() {
                     <table className="table table-hover">
                         <thead className="table-light">
                         <tr>
-                            <th>Категорія</th>
                             <th>Назва</th>
+                            <th>Категорія</th>
+                            <th>Виробник</th>
                             <th>Характеристики</th>
                             <th>Дії</th>
                         </tr>
@@ -215,8 +256,9 @@ export default function ProductsPage() {
                         <tbody>
                         {products.map((prod) => (
                             <tr key={prod.idProduct}>
-                                <td>{prod.categoryName}</td>
                                 <td>{prod.productName}</td>
+                                <td>{prod.categoryName}</td>
+                                <td>{prod.manufacturer}</td>
                                 <td>{prod.characteristics}</td>
                                 <td>
                                     <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(prod)}>Редагувати</button>

@@ -4,23 +4,29 @@ import axios from "axios";
 export default function CashierProductsPage() {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [search, setSearch] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [filter, setFilter] = useState({ categoryName: "" });
     const [error, setError] = useState("");
     const printRef = useRef();
 
     useEffect(() => {
-        fetchProducts();
         fetchCategories();
+        fetchProducts(); // стартове завантаження всіх
     }, []);
 
-    const fetchProducts = () => {
-        axios.get("http://localhost:5112/api/products/filter", {
-            params: { orderBy: "product_name" },
-            withCredentials: true
-        })
-            .then((res) => setProducts(res.data))
-            .catch(() => setError("Не вдалося завантажити продукти"));
+    const fetchProducts = async (categoryName = "") => {
+        try {
+            const params = {};
+            if (categoryName) params.categoryName = categoryName;
+
+            const res = await axios.get("http://localhost:5112/api/products/filter", {
+                params,
+                withCredentials: true
+            });
+
+            setProducts(res.data);
+        } catch {
+            setError("Не вдалося завантажити продукти");
+        }
     };
 
     const fetchCategories = () => {
@@ -28,12 +34,6 @@ export default function CashierProductsPage() {
             .then((res) => setCategories(res.data))
             .catch(() => setError("Не вдалося завантажити категорії"));
     };
-
-    const filtered = products.filter(p => {
-        const matchesName = p.productName.toLowerCase().includes(search.toLowerCase());
-        const matchesCategory = selectedCategory === "" || p.categoryName === selectedCategory;
-        return matchesName && matchesCategory;
-    });
 
     const handlePrint = () => {
         const printWindow = window.open("", "_blank", "width=800,height=600");
@@ -67,59 +67,84 @@ export default function CashierProductsPage() {
         setTimeout(() => printWindow.print(), 500);
     };
 
+    const handleFilter = (e) => {
+        e.preventDefault();
+        fetchProducts(filter.categoryName);
+    };
+
     return (
-        <div className="container mt-4">
-            <h2 className="mb-3">Товари</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
+        <div className="container-fluid bg-light min-vh-100 py-4">
+            <div className="container">
+                <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                    <div>
+                        <h2 className="fw-bold mb-0">Товари</h2>
+                        <small className="text-muted">Перегляд товарів у магазині</small>
+                    </div>
+                    <div className="d-flex gap-2">
+                        <button className="btn btn-outline-primary" onClick={handlePrint}>
+                            Друк звіту
+                        </button>
+                        <button className="btn btn-outline-secondary" onClick={() => window.location.href = "/cashier"}>
+                            Головне меню
+                        </button>
+                    </div>
+                </div>
 
-            <div className="row mb-3">
-                <div className="col-md-4">
-                    <input
-                        className="form-control"
-                        type="text"
-                        placeholder="Пошук за назвою"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
-                <div className="col-md-4">
-                    <select
-                        className="form-select"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                        <option value="">Усі категорії</option>
-                        {categories.map(c => (
-                            <option key={c.categoryNumber} value={c.categoryName}>{c.categoryName}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col-md-4 text-end">
-                    <button className="btn btn-outline-primary" onClick={handlePrint}>
-                        Друк звіту
-                    </button>
-                </div>
-            </div>
+                {error && <div className="alert alert-danger">{error}</div>}
 
-            <div ref={printRef}>
-                <table className="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>Назва</th>
-                        <th>Категорія</th>
-                        <th>Характеристики</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {filtered.map(p => (
-                        <tr key={p.idProduct}>
-                            <td>{p.productName}</td>
-                            <td>{p.categoryName}</td>
-                            <td>{p.characteristics}</td>
+                <form onSubmit={handleFilter} className="row g-3 align-items-end mb-4">
+                    <div className="col-md-6">
+                        <label className="form-label">Категорія товару</label>
+                        <select
+                            className="form-select"
+                            value={filter.categoryName}
+                            onChange={(e) => setFilter({ categoryName: e.target.value })}
+                        >
+                            <option value="">Усі категорії</option>
+                            {categories.map(c => (
+                                <option key={c.categoryNumber} value={c.categoryName}>
+                                    {c.categoryName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="col-md-3">
+                        <button type="submit" className="btn btn-outline-dark w-100">Застосувати фільтр</button>
+                    </div>
+                    <div className="col-md-3">
+                        <button
+                            type="button"
+                            className="btn btn-secondary w-100"
+                            onClick={() => {
+                                setFilter({ categoryName: "" });
+                                fetchProducts();
+                            }}
+                        >
+                            Очистити
+                        </button>
+                    </div>
+                </form>
+
+                <div ref={printRef} className="bg-white p-3 shadow-sm rounded border">
+                    <table className="table table-hover">
+                        <thead className="table-light">
+                        <tr>
+                            <th>Назва</th>
+                            <th>Категорія</th>
+                            <th>Характеристики</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {products.map(p => (
+                            <tr key={p.idProduct}>
+                                <td>{p.productName}</td>
+                                <td>{p.categoryName}</td>
+                                <td>{p.characteristics}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

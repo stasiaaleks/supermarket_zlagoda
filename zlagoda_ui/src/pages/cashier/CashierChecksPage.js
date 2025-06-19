@@ -28,6 +28,7 @@ export default function CashierCheckPage() {
 
     useEffect(() => {
         if (cashierId) {
+// eslint-disable-next-line react-hooks/exhaustive-deps
             fetchChecks();
         }
     }, [cashierId]);
@@ -194,11 +195,25 @@ export default function CashierCheckPage() {
 
     return (
         <div className="container py-4">
-            <h2 className="mb-4">Мої чеки</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="mb-0">Мої чеки</h2>
+                <div className="d-flex gap-2">
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={() => window.location.href = "/cashier"}
+                    >
+                        Головне меню
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={handlePrint}>
+                        Друк
+                    </button>
+                </div>
+            </div>
+
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="row align-items-end gy-3 gx-4 mb-4">
-                <div className="col-auto">
+            <div className="row g-3 mb-4 align-items-end">
+                <div className="col-md-3">
                     <label className="form-label">Початкова дата</label>
                     <input
                         type="date"
@@ -207,7 +222,7 @@ export default function CashierCheckPage() {
                         onChange={e => setStartDate(e.target.value)}
                     />
                 </div>
-                <div className="col-auto">
+                <div className="col-md-3">
                     <label className="form-label">Кінцева дата</label>
                     <input
                         type="date"
@@ -216,22 +231,26 @@ export default function CashierCheckPage() {
                         onChange={e => setEndDate(e.target.value)}
                     />
                 </div>
-                <div className="col-auto d-flex align-items-end gap-3">
-                    <button className="btn btn-outline-dark px-4 fw-semibold" onClick={handleToday}>
+                <div className="col-md-2 d-grid">
+                    <button className="btn btn-outline-dark" onClick={handleToday}>
                         Сьогодні
                     </button>
-                    <button className="btn btn-outline-dark px-4 fw-semibold" onClick={fetchChecks}>
+                </div>
+                <div className="col-md-2 d-grid">
+                    <button className="btn btn-outline-dark" onClick={fetchChecks}>
                         Застосувати фільтр
                     </button>
                 </div>
-                <div className="col-auto">
-                    <button className="btn btn-outline-primary px-4 fw-semibold" onClick={handlePrint}>
-                        Друк
-                    </button>
-                </div>
-                <div className="col-auto">
-                    <button className="btn btn-success px-4 fw-semibold" onClick={openModal}>
-                        Створити чек
+                <div className="col-md-2 d-grid">
+                    <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => {
+                            setStartDate("");
+                            setEndDate("");
+                            fetchChecks();
+                        }}
+                    >
+                        Очистити
                     </button>
                 </div>
             </div>

@@ -16,6 +16,7 @@ import CashierChecksPage from "./pages/cashier/CashierChecksPage";
 import CashierStoreProductPage from "./pages/cashier/CashierStoreProductPage";
 import CashierProductsPage from "./pages/cashier/CashierProductsPage";
 import CashierCustomerPage from "./pages/cashier/CashierCustomerCardsPage";
+import ChangePasswordPage from "./pages/shared/ChangePasswordPage";
 
 export default function App() {
     return (
@@ -69,6 +70,15 @@ export default function App() {
                     }
                 />
 
+                <Route
+                    path="/manager/change-password"
+                    element={
+                        <PrivateRoute role="Manager">
+                            <ChangePasswordPage />
+                        </PrivateRoute>
+                    }
+                />
+
 
                 {/* Панель касира */}
                 <Route
@@ -116,8 +126,9 @@ export default function App() {
                     }
                 />
 
-                {/* 404 */}
+                {/* shared */}
                 <Route path="*" element={<NotFoundPage />} />
+                <Route path="/change-password" element={<ChangePasswordPage />} />
             </Routes>
         </BrowserRouter>
     );
