@@ -11,7 +11,7 @@ public interface ICategoryService
 {
     Task<IEnumerable<CategoryDto>> GetAll();
     Task<IEnumerable<CategoryDto>> GetByNum(int number);
-    Task<int> CreateCategory(CategoryDto dto);
+    Task<int> CreateCategory(CreateCategoryDto dto);
     Task<int> UpdateByNum(CategoryDto dto);
     Task<bool> DeleteByNum(string number);
     
@@ -52,7 +52,7 @@ public class CategoryService : ICategoryService
         return _mapper.Map<IEnumerable<CategoryDto>>(categories);
     }
 
-    public async Task<int> CreateCategory(CategoryDto dto)
+    public async Task<int> CreateCategory(CreateCategoryDto dto)
     {
         var category = _mapper.Map<Category>(dto);
         var newId = await _categoryRepo.InsertAsync<int>(category, _queryProvider.CreateSingle);

@@ -21,9 +21,7 @@ public class ProductController : ControllerBase
 
     [HttpGet]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
-    [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)] - TODO: discuss if needed
-    //[ProducesResponseType(StatusCodes.Status403Forbidden)] - TODO:  discuss if needed
+    [ProducesResponseType(typeof(IEnumerable<ProductWithCategoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllProducts()
     {
         var products = await _productService.GetAll();
@@ -32,7 +30,7 @@ public class ProductController : ControllerBase
     
     [HttpGet("{id}")]
     [Authorize]
-    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProductWithCategoryDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProductById([FromRoute] string id)
     {
         var products = await _productService.GetById(id);
@@ -41,7 +39,7 @@ public class ProductController : ControllerBase
     
     [HttpGet("filter")]
     [Authorize]
-    [ProducesResponseType(typeof(IEnumerable<ProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ProductWithCategoryDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FilterProducts([FromQuery] ProductSearchCriteria searchCriteria)
     {
         var products = await _productService.Filter(searchCriteria);
@@ -60,7 +58,7 @@ public class ProductController : ControllerBase
     [HttpPut]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Update([FromBody] UpdateProductDto dto)
+    public async Task<IActionResult> Update([FromBody] ProductDto dto)
     {
         var id = await _productService.UpdateById(dto);
         if (string.IsNullOrEmpty(id)) return BadRequest();

@@ -39,7 +39,7 @@ public class CategoryController : ControllerBase
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] CategoryDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
     {
         var number = await _categoryService.CreateCategory(dto);
         if (number == null) return BadRequest();

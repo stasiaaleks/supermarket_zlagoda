@@ -8,11 +8,11 @@ namespace ShopApp.Services;
 
 public interface IProductService
 {
-    Task<IEnumerable<ProductDto>> GetAll();
-    Task<IEnumerable<ProductDto>> Filter(ProductSearchCriteria criteria);
-    Task<ProductDto> GetById(string id);
+    Task<IEnumerable<ProductWithCategoryDto>> GetAll();
+    Task<IEnumerable<ProductWithCategoryDto>> Filter(ProductSearchCriteria criteria);
+    Task<ProductWithCategoryDto> GetById(string id);
     Task<string> CreateProduct(CreateProductDto dto);
-    Task<string> UpdateById(UpdateProductDto dto);
+    Task<string> UpdateById(ProductDto dto);
     Task<bool> DeleteById(string number);
 }
 
@@ -29,22 +29,21 @@ public class ProductService : IProductService
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<ProductDto>> GetAll()
+    public async Task<IEnumerable<ProductWithCategoryDto>> GetAll()
     {
-        return await _productRepo.GetAllAsync<ProductDto>(_queryProvider.GetAll);
+        return await _productRepo.GetAllAsync<ProductWithCategoryDto>(_queryProvider.GetAll);
     }
 
-    public async Task<IEnumerable<ProductDto>> Filter(ProductSearchCriteria criteria)
+    public async Task<IEnumerable<ProductWithCategoryDto>> Filter(ProductSearchCriteria criteria)
     {
         var query = _queryProvider.GetAll;
-        var products = await _productRepo.FilterByPredicateAsync(query, criteria);
+        var products = await _productRepo.FilterByPredicateAsync<ProductWithCategoryDto>(query, criteria);
         return products;
     }
 
-    public async Task<ProductDto> GetById(string id)
+    public async Task<ProductWithCategoryDto> GetById(string id)
     {
-        var product = await _productRepo.GetByIdAsync(_queryProvider.GetById, id);
-        return _mapper.Map<ProductDto>(product);
+        return await _productRepo.GetByIdAsync<ProductWithCategoryDto>(_queryProvider.GetById, id);
     }
     public async Task<string> CreateProduct(CreateProductDto dto)
     {
@@ -53,10 +52,9 @@ public class ProductService : IProductService
         return newId;
     }
     
-    public async Task<string> UpdateById(UpdateProductDto dto)
+    public async Task<string> UpdateById(ProductDto dto)
     {
-        var productToUpdate = _mapper.Map<ProductDto>(dto);
-        var updatedId = await _productRepo.UpdateAsync<string>(productToUpdate, _queryProvider.UpdateById);
+        var updatedId = await _productRepo.UpdateAsync<string>(dto, _queryProvider.UpdateById);
         return updatedId;
     }
 
