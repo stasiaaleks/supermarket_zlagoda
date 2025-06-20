@@ -1,5 +1,7 @@
+using System.Data;
 using System.Dynamic;
 using Dapper;
+using Npgsql;
 using ShopApp.DAL.DbConnection;
 using ShopApp.DAL.Queries;
 
@@ -117,9 +119,8 @@ public class Repository<T> : IRepository<T> where T : class
     {
         using var connection = await _dbConnectionProvider.Connect();
         var query = _sqlQueryRegistry.Load(queryPath);
-        
         var totalQueryParameters = MergeEntityParameters(parameters, entity);
-        return await connection.ExecuteScalarAsync<TResult>(query, totalQueryParameters);
+        return await ExecuteSafeCreateUpdate<TResult>(connection, query, totalQueryParameters);
     }
 
     public async Task<TResult> UpdateAsync<TResult>(T entity, string queryPath, object? parameters = null)
@@ -128,7 +129,7 @@ public class Repository<T> : IRepository<T> where T : class
         var query = _sqlQueryRegistry.Load(queryPath);
 
         var totalQueryParameters = MergeEntityParameters(parameters, entity);
-        return await connection.ExecuteScalarAsync<TResult>(query, totalQueryParameters);
+        return await ExecuteSafeCreateUpdate<TResult>(connection, query, totalQueryParameters);
     }
 
     public async Task<int> DeleteAsync(string queryPath, object? parameters = null)
@@ -156,6 +157,33 @@ public class Repository<T> : IRepository<T> where T : class
     {
         var nextval = await ExecuteScalarAsync<string>(sequenceQueryPath);
         return $"{prefix}{nextval}";
+    }
+    
+    private async Task<TResult> ExecuteSafeCreateUpdate<TResult>(IDbConnection connection, string query, object parameters) {
+        try
+        {
+            return await connection.ExecuteScalarAsync<TResult>(query, parameters);
+        }
+        catch (PostgresException ex) when (ex.SqlState is "23514" or "23505")
+        {
+            return ex.SqlState switch
+            {
+                "23514" => ex.ConstraintName switch
+                {
+                    "age_check" => throw new ArgumentException("Employee must be at least 18 years old."),
+                    "salary_check" => throw new ArgumentException("Salary must be greater than 0."),
+                    _ => throw new ArgumentException($"Invalid input: {ex.ConstraintName} constraint violated.")
+                },
+                "23505" => ex.ConstraintName switch
+                {
+                    "employee_phone_unique" => throw new ArgumentException("Phone number must be unique."),
+                    "category_phone_unique" => throw new ArgumentException("Phone number must be unique."),
+                    _ => throw new ArgumentException($"Duplicate value: {ex.ConstraintName} unique constraint violated.")
+                },
+
+                _ => throw new ArgumentException("Database constraint violation.")
+            };
+        }
     }
     
     private object MergeEntityParameters(object? parameters, T entity)

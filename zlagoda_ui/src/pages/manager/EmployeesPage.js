@@ -95,7 +95,7 @@ export default function EmployeesPage() {
             setEditMode(false);
             fetchEmployees();
         } catch (err) {
-            setError("Помилка при збереженні");
+            setError(err?.response?.data?.error || "Помилка при збереженні");
         }
     };
 

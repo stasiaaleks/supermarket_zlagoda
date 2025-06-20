@@ -44,7 +44,6 @@ app.UseCors("AllowLocal");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-// app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 

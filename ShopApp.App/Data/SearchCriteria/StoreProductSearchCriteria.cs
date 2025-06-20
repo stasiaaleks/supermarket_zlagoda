@@ -4,7 +4,6 @@ namespace ShopApp.Data.SearchCriteria;
 
 public class StoreProductSearchCriteria : DAL.Queries.SearchCriteria
 {
-    // NOTE: reconsider using product number here
     public string? ProductName { get; set; }
     public int? ProductsNumberFrom { get; set; }
     public int? ProductsNumberTo { get; set; }
