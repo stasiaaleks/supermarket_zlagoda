@@ -23,7 +23,7 @@ public class StatisticsController: ControllerBase
     }
     
     [HttpGet("same-checks-as/{surname}")]
-    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<CashierCheckData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCashiersWithSameChecks([FromRoute] string surname)
     {
         var data = await _statisticsService.GetCashiersWithSameChecks(surname);
@@ -31,7 +31,7 @@ public class StatisticsController: ControllerBase
     }
     
     [HttpGet("cashiers-min-checks-products/")]
-    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<CashierChecksCountData>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCashiersMinProductsMinChecks([FromQuery] int minProducts, int minChecks)
     {
         var data = await _statisticsService.GetCashiersMinProductsMinChecks(minProducts, minChecks);
