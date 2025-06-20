@@ -172,16 +172,17 @@ public class Repository<T> : IRepository<T> where T : class
                 {
                     "age_check" => throw new ArgumentException("Employee must be at least 18 years old."),
                     "salary_check" => throw new ArgumentException("Salary must be greater than 0."),
-                    _ => throw new ArgumentException($"Invalid input: {ex.ConstraintName} constraint violated.")
+                    "phone_check" => throw new ArgumentException("Phone must have 13 digits and start with +."),
+                    _ => throw new ArgumentException("Invalid input detected.")
                 },
                 "23505" => ex.ConstraintName switch
                 {
                     "employee_phone_unique" => throw new ArgumentException("Phone number must be unique."),
                     "category_phone_unique" => throw new ArgumentException("Phone number must be unique."),
-                    _ => throw new ArgumentException($"Duplicate value: {ex.ConstraintName} unique constraint violated.")
+                    _ => throw new ArgumentException("Duplicate value detected.")
                 },
 
-                _ => throw new ArgumentException("Database constraint violation.")
+                _ => throw new ArgumentException("Invalid input detected.")
             };
         }
     }
