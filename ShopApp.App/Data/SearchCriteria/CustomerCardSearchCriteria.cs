@@ -21,7 +21,6 @@ public class CustomerCardSearchCriteria : DAL.Queries.SearchCriteria
     
     public override IPredicate ToPredicate()
     {
-        // TODO: rename to Surname, refactor parameters addition to predicate
         var predicate = new SqlPredicate();
 
         if (!string.IsNullOrWhiteSpace(PhoneNumber))

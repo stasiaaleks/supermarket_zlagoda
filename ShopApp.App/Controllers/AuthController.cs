@@ -35,7 +35,7 @@ public class AuthController: ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUserWithEmployee([FromBody] RegisterDto dto)
     {
-        var createdUser = await _authService.RegisterUserWithEmployee(dto);
+        var createdUser = await _authService.CreateAccount(dto);
         if (createdUser == null) return BadRequest();
         
         await LoginUser(createdUser); 
