@@ -28,21 +28,11 @@ public class StoreProductController : ControllerBase
         return Ok(products);
     }
     
-    [HttpGet("availability/restricted/{upc}")]
-    [VerifyRole(EmployeeRoles.Cashier)]
-    [ProducesResponseType(typeof(StoreProductPriceNumberDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetRestrictedAvailabilityByUpc([FromRoute] string upc)
-    {
-        var dto = await _productService.GetPriceAndNumberByUpc(upc);
-        return Ok(dto);
-    }
-    
-    [HttpGet("availability/{upc}")]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [HttpGet("{upc}")]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(StoreProductDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAvailabilityByUpc([FromRoute] string upc)
+    public async Task<IActionResult> GetByUpc([FromRoute] string upc)
     {
-        // TODO: rename query from GetProductInfoByUpc (ambiguous)
         var dto = await _productService.GetProductInfoByUpc(upc);
         return Ok(dto);
     }
