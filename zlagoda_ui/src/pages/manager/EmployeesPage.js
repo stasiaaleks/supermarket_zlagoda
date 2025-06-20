@@ -257,49 +257,33 @@ export default function EmployeesPage() {
                 {contacts.length > 0 && (
                     <div ref={contactsPrintRef} className="bg-white p-3 mb-4 shadow-sm rounded border">
                         <h5>Контакти працівників з прізвищем «{surnameSearch}»</h5>
-                        <table className="table table-bordered">
+                        <table className="table table-bordered mb-3">
                             <thead className="table-light">
                             <tr>
                                 <th>Прізвище</th>
                                 <th>Імʼя</th>
-                                <th>По батькові</th>
-                                <th>Посада</th>
-                                <th>Зарплата</th>
-                                <th>Дата народження</th>
-                                <th>Дата старту</th>
                                 <th>Телефон</th>
                                 <th>Місто</th>
                                 <th>Вулиця</th>
                                 <th>Індекс</th>
-                                <th>Дії</th>
                             </tr>
                             </thead>
-
-
                             <tbody>
-                            {employees.map(emp => (
-                                <tr key={emp.idEmployee}>
-                                    <td>{emp.surname}</td>
-                                    <td>{emp.name}</td>
-                                    <td>{emp.patronymic}</td>
-                                    <td>{emp.role}</td>
-                                    <td>{emp.salary} грн</td>
-                                    <td>{new Date(emp.dateOfBirth).toLocaleDateString()}</td>
-                                    <td>{new Date(emp.dateOfStart).toLocaleDateString()}</td>
-                                    <td>{emp.phoneNumber}</td>
-                                    <td>{emp.city}</td>
-                                    <td>{emp.street}</td>
-                                    <td>{emp.zipCode}</td>
-                                    <td>
-                                        <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(emp)}>Редагувати</button>
-                                        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(emp.idEmployee)}>Видалити</button>
-                                    </td>
+                            {contacts.map((c, i) => (
+                                <tr key={i}>
+                                    <td>{c.surname}</td>
+                                    <td>{c.name}</td>
+                                    <td>{c.phoneNumber}</td>
+                                    <td>{c.city}</td>
+                                    <td>{c.street}</td>
+                                    <td>{c.zipCode}</td>
                                 </tr>
                             ))}
                             </tbody>
-
                         </table>
-                        <button onClick={handlePrintContacts} className="btn btn-outline-dark">Друк контактів</button>
+                        <div className="text-start">
+                            <button onClick={handlePrintContacts} className="btn btn-outline-dark">Друк контактів</button>
+                        </div>
                     </div>
                 )}
 
@@ -327,7 +311,7 @@ export default function EmployeesPage() {
                                 <td>{emp.surname}</td>
                                 <td>{emp.name}</td>
                                 <td>{emp.patronymic}</td>
-                                <td>{emp.role}</td>
+                                <td>{emp.role.toLowerCase() === 'manager' ? 'Manager' : 'Cashier'}</td>
                                 <td>{emp.salary} грн</td>
                                 <td>{new Date(emp.dateOfBirth).toLocaleDateString()}</td>
                                 <td>{new Date(emp.dateOfStart).toLocaleDateString()}</td>

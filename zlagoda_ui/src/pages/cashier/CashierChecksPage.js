@@ -84,29 +84,88 @@ export default function CashierCheckPage() {
         setExpandedCheck(checkNumber);
     };
 
-    const handlePrint = () => {
-        const printContent = printRef.current.innerHTML;
-        const printWindow = window.open("", "", "width=900,height=600");
-        if (!printWindow) return;
-        printWindow.document.write(`
+    const handlePrint = async () => {
+        try {
+            if (!cashierId) return setError("Немає ідентифікатора касира");
+
+            const res = await axios.get(`http://localhost:5112/api/checks/cashiers/${cashierId}/sales`, {
+                withCredentials: true
+            });
+
+            const checks = res.data;
+
+            const detailedChecks = await Promise.all(
+                checks.map(async (check) => {
+                    try {
+                        const res = await axios.get(`http://localhost:5112/api/checks/${check.checkNumber}/sales`, {
+                            withCredentials: true,
+                        });
+                        return res.data;
+                    } catch {
+                        return { ...check, sales: [] };
+                    }
+                })
+            );
+
+            const content = detailedChecks.map((check) => `
+            <h4>Чек №${check.checkNumber}</h4>
+            <p>
+                <strong>Картка:</strong> ${check.cardNumber || "-"}<br/>
+                <strong>Дата:</strong> ${new Date(check.printDate).toLocaleString()}<br/>
+                <strong>Сума:</strong> ${check.sumTotal.toFixed(2)} грн<br/>
+                <strong>ПДВ:</strong> ${check.vat.toFixed(2)} грн
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                <thead style="background: #eee;">
+                    <tr>
+                        <th style="border: 1px solid #333; padding: 6px;">Назва товару</th>
+                        <th style="border: 1px solid #333; padding: 6px;">К-сть</th>
+                        <th style="border: 1px solid #333; padding: 6px;">Ціна</th>
+                        <th style="border: 1px solid #333; padding: 6px;">Разом</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${check.sales.map(sale => `
+                        <tr>
+                            <td style="border: 1px solid #333; padding: 6px;">${sale.productName}</td>
+                            <td style="border: 1px solid #333; padding: 6px;">${sale.productNumber}</td>
+                            <td style="border: 1px solid #333; padding: 6px;">${sale.sellingPrice.toFixed(2)} грн</td>
+                            <td style="border: 1px solid #333; padding: 6px;">${(sale.productNumber * sale.sellingPrice).toFixed(2)} грн</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        `).join("<hr/>");
+
+            const html = `
             <html>
             <head>
-                <title>Чеки</title>
+                <title>Звіт про чеки касира</title>
                 <style>
                     body { font-family: sans-serif; padding: 20px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+                    h4 { margin-bottom: 0.2em; }
+                    p { margin-top: 0; line-height: 1.4; }
                 </style>
             </head>
             <body>
-                ${printContent}
+                <h2>Звіт про всі чеки касира</h2>
+                ${content}
             </body>
             </html>
-        `);
-        printWindow.document.close();
-        printWindow.focus();
-        setTimeout(() => printWindow.print(), 500);
+        `;
+
+            const printWindow = window.open("", "_blank", "width=900,height=600");
+            if (!printWindow) return;
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        } catch {
+            setError("Не вдалося згенерувати звіт");
+        }
     };
+
 
     const handleToday = () => {
         const today = new Date().toISOString().split("T")[0];
@@ -123,7 +182,7 @@ export default function CashierCheckPage() {
 
         try {
             const res = await axios.get(
-                `http://localhost:5112/api/store-products/availability/restricted/${newItem.upc}`,
+                `http://localhost:5112/api/store-products/${newItem.upc}`,
                 { withCredentials: true }
             );
 
@@ -212,8 +271,8 @@ export default function CashierCheckPage() {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="row g-3 mb-4 align-items-end">
-                <div className="col-md-3">
+            <form className="row g-3 align-items-end mb-4" onSubmit={e => { e.preventDefault(); fetchChecks(); }}>
+                <div className="col-md-2">
                     <label className="form-label">Початкова дата</label>
                     <input
                         type="date"
@@ -222,7 +281,7 @@ export default function CashierCheckPage() {
                         onChange={e => setStartDate(e.target.value)}
                     />
                 </div>
-                <div className="col-md-3">
+                <div className="col-md-2">
                     <label className="form-label">Кінцева дата</label>
                     <input
                         type="date"
@@ -232,18 +291,19 @@ export default function CashierCheckPage() {
                     />
                 </div>
                 <div className="col-md-2 d-grid">
-                    <button className="btn btn-outline-dark" onClick={handleToday}>
+                    <button type="button" className="btn btn-outline-dark" onClick={handleToday}>
                         Сьогодні
                     </button>
                 </div>
                 <div className="col-md-2 d-grid">
-                    <button className="btn btn-outline-dark" onClick={fetchChecks}>
+                    <button type="submit" className="btn btn-outline-dark">
                         Застосувати фільтр
                     </button>
                 </div>
                 <div className="col-md-2 d-grid">
                     <button
-                        className="btn btn-outline-secondary"
+                        type="button"
+                        className="btn btn-secondary"
                         onClick={() => {
                             setStartDate("");
                             setEndDate("");
@@ -253,7 +313,13 @@ export default function CashierCheckPage() {
                         Очистити
                     </button>
                 </div>
-            </div>
+                <div className="col-md-2 d-grid">
+                    <button className="btn btn-success" onClick={openModal}>
+                        Створити чек
+                    </button>
+                </div>
+            </form>
+
 
 
 

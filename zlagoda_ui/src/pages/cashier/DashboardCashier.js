@@ -28,10 +28,13 @@ export default function DashboardCashier() {
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
                 <div>
-                    <h2>Вітаю, {user.name} {user.surname}!</h2>
-                    <p><strong>Ваша роль:</strong> {user.role?.toUpperCase()}</p>
+                    <h2 className="fw-bold mb-0">Панель касира</h2>
+                    <small className="text-muted">Користувач: {user.surname} {user.name}</small>
                 </div>
-                <button onClick={handleLogout} className="btn btn-sm btn-outline-danger">Вийти</button>
+                <div className="d-flex align-items-center gap-2">
+                    <span className="badge bg-secondary p-2">{user.role?.toUpperCase()}</span>
+                    <button onClick={handleLogout} className="btn btn-sm btn-outline-danger">Вийти</button>
+                </div>
             </div>
 
             <div className="row mb-4">
