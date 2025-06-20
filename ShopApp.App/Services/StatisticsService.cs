@@ -11,6 +11,8 @@ public interface IStatisticsService
     Task<CashierPromProductsNumericData> GetPromProductsSumQuantityByCashier(string idEmployee);
     Task<IEnumerable<CashierCheckData>> GetCashiersWithSameChecks(string surname);
     Task<IEnumerable<CashierChecksCountData>> GetCashiersMinProductsMinChecks(int minProducts, int minChecks);
+    Task<IEnumerable<ProductsSoldOnlyPromo>> GetProductsSoldOnlyPromo();
+
 }
 
 public class StatisticsService: IStatisticsService
@@ -40,5 +42,10 @@ public class StatisticsService: IStatisticsService
     {
         var parameters = new { MinProducts = minProducts, MinChecks = minChecks };
         return await _repository.GetAllAsync<CashierChecksCountData>(_queryProvider.GetCashiersMinProductsMinChecks, parameters);
+    }
+    
+    public async Task<IEnumerable<ProductsSoldOnlyPromo>> GetProductsSoldOnlyPromo()
+    {
+        return await _repository.GetAllAsync<ProductsSoldOnlyPromo>(_queryProvider.GetProductsSoldOnlyPromo);
     }
 }

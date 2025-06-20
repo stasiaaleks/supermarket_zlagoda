@@ -37,5 +37,13 @@ public class StatisticsController: ControllerBase
         var data = await _statisticsService.GetCashiersMinProductsMinChecks(minProducts, minChecks);
         return Ok(data);
     }
+    
+    [HttpGet("sold-only-promo-products")]
+    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetProductsSoldOnlyPromo()
+    {
+        var data = await _statisticsService.GetProductsSoldOnlyPromo();
+        return Ok(data);
+    }
         
 }

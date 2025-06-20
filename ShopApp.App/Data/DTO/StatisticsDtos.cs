@@ -18,6 +18,14 @@ public class CashierCheckData
     public string CheckNumber { get; set; }
 }
 
+public class ProductsSoldOnlyPromo
+{
+    public string UPC { get; set; }
+    public string IdProduct { get; set; }
+    public string ProductName { get; set; }
+    public string TotalQuantity { get; set; }
+}
+
 public class CashierChecksCountData
 {
     public string IdEmployee { get; set; }
