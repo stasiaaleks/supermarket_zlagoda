@@ -43,7 +43,7 @@ public class CheckService : ICheckService
 
     public async Task<IEnumerable<CheckWithSalesListDto>> GetAllWithSalesByPeriod(DateTime? start, DateTime? end)
     {
-        var (validStart, validEnd) = ValidateNullDatetimeValues(start, end);
+        var (validStart, validEnd) = ValidateDatetimeValues(start, end);
         var query = _queryProvider.GetAllWithSalesByPeriod;
         var checks = await _checkRepo.GetAllAsync<CheckWithSaleDto>(query, new { StartDate = validStart, EndDate = validEnd });
         return _mapper.Map<IEnumerable<CheckWithSalesListDto>>(checks);
@@ -51,7 +51,7 @@ public class CheckService : ICheckService
 
     public async Task<IEnumerable<CheckWithSalesListDto>> GetAllWithSalesByPeriodAndCashier(DateTime? start, DateTime? end, string cashierId)
     {
-        var (validStart, validEnd) = ValidateNullDatetimeValues(start, end);
+        var (validStart, validEnd) = ValidateDatetimeValues(start, end);
         var query = _queryProvider.GetAllWithSalesByPeriodAndEmployee;
         var parameters = new { StartDate = validStart, EndDate = validEnd, EmployeeId = cashierId };
         var checks = await _checkRepo.GetAllAsync<CheckWithSaleDto>(query, parameters);
@@ -60,7 +60,7 @@ public class CheckService : ICheckService
 
     public async Task<CheckSumDto> GetSumByPeriod(DateTime? start, DateTime? end)
     {
-        var (validStart, validEnd) = ValidateNullDatetimeValues(start, end);
+        var (validStart, validEnd) = ValidateDatetimeValues(start, end);
         var query = _queryProvider.GetSumByPeriod;
         var parameters = new { StartDate = validStart, EndDate = validEnd };
         return await _checkRepo.GetSingleAsync<CheckSumDto>(query, parameters);
@@ -68,7 +68,7 @@ public class CheckService : ICheckService
 
     public async Task<CheckSumDto> GetSumByEmployeeAndPeriod(DateTime? start, DateTime? end, string cashierId)
     {
-        var (validStart, validEnd) = ValidateNullDatetimeValues(start, end);
+        var (validStart, validEnd) = ValidateDatetimeValues(start, end);
         var query = _queryProvider.GetSumByPeriodAndEmployee;
         var parameters = new { StartDate = validStart, EndDate = validEnd, EmployeeId = cashierId };
         return await _checkRepo.GetSingleAsync<CheckSumDto>(query, parameters);
@@ -115,10 +115,10 @@ public class CheckService : ICheckService
         return createdEntityId;
     }
     
-    private (DateTime start, DateTime end) ValidateNullDatetimeValues(DateTime? start, DateTime? end)
+    private (DateTime start, DateTime end) ValidateDatetimeValues(DateTime? start, DateTime? end)
     {
         var validStart = start ?? DateTime.MinValue;
-        var validEnd = end ?? DateTime.UtcNow.Date.AddDays(1);
+        var validEnd = end?.AddDays(1) ?? DateTime.UtcNow.Date.AddDays(1);
         return (validStart, validEnd);
     }
 }
