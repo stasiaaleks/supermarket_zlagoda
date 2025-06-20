@@ -4,7 +4,7 @@ public class CustomerCardQueryProvider: IQueryByNamespaceProvider
 {
     private const string FolderName = "CustomerCard";
     private const string GetAllQuery = "get_all";
-    private const string GetByIdQuery = "get_by_id";
+    private const string GetByCardNumQuery = "get_by_card_num";
     private const string GetSeqNextValQuery = "get_seq_nextval";
     
     private const string CreateSingleQuery = "create_single";
@@ -13,7 +13,7 @@ public class CustomerCardQueryProvider: IQueryByNamespaceProvider
     
 
     public string GetAll => GetNamespace(GetAllQuery);
-    public string GetById => GetNamespace(GetByIdQuery);
+    public string GetByCardNum => GetNamespace(GetByCardNumQuery);
     public string CreateSingle => GetNamespace(CreateSingleQuery);
     public string DeleteByCardNum => GetNamespace(DeleteByCardNumQuery);
     public string UpdateByCardNum => GetNamespace(UpdateByCardNumQuery);
