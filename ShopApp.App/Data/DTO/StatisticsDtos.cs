@@ -17,3 +17,11 @@ public class CashierCheckData
     public string Surname { get; set; }
     public string CheckNumber { get; set; }
 }
+
+public class CashierChecksCountData
+{
+    public string IdEmployee { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public int ChecksAmount { get; set; }
+}

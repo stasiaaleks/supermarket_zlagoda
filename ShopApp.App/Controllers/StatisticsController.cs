@@ -29,5 +29,13 @@ public class StatisticsController: ControllerBase
         var data = await _statisticsService.GetCashiersWithSameChecks(surname);
         return Ok(data);
     }
+    
+    [HttpGet("cashiers-min-checks-products/")]
+    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCashiersMinProductsMinChecks([FromQuery] int minProducts, int minChecks)
+    {
+        var data = await _statisticsService.GetCashiersMinProductsMinChecks(minProducts, minChecks);
+        return Ok(data);
+    }
         
 }

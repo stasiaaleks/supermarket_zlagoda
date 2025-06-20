@@ -10,6 +10,7 @@ public interface IStatisticsService
 {
     Task<CashierPromProductsNumericData> GetPromProductsSumQuantityByCashier(string idEmployee);
     Task<IEnumerable<CashierCheckData>> GetCashiersWithSameChecks(string surname);
+    Task<IEnumerable<CashierChecksCountData>> GetCashiersMinProductsMinChecks(int minProducts, int minChecks);
 }
 
 public class StatisticsService: IStatisticsService
@@ -33,5 +34,11 @@ public class StatisticsService: IStatisticsService
     {
         var parameters = new { Surname = surname };
         return await _repository.GetAllAsync<CashierCheckData>(_queryProvider.GetSameChecksAsCashierBySurname, parameters);
+    }
+
+    public async Task<IEnumerable<CashierChecksCountData>> GetCashiersMinProductsMinChecks(int minProducts, int minChecks)
+    {
+        var parameters = new { MinProducts = minProducts, MinChecks = minChecks };
+        return await _repository.GetAllAsync<CashierChecksCountData>(_queryProvider.GetCashiersMinProductsMinChecks, parameters);
     }
 }
