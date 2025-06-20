@@ -58,7 +58,7 @@ export default function CardsPage() {
             if (editMode) {
                 await axios.put("http://localhost:5112/api/cards", form, { withCredentials: true });
             } else {
-                const { cardNumber, ...createDto } = form; // exclude cardNumber
+                const { cardNumber, ...createDto } = form;
                 await axios.post("http://localhost:5112/api/cards", createDto, { withCredentials: true });
             }
             setForm({

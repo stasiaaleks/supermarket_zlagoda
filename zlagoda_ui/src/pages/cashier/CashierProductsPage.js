@@ -10,7 +10,7 @@ export default function CashierProductsPage() {
 
     useEffect(() => {
         fetchCategories();
-        fetchProducts(); // стартове завантаження всіх
+        fetchProducts();
     }, []);
 
     const fetchProducts = async (categoryName = "") => {

@@ -16,12 +16,14 @@ export default function CashierCheckPage() {
     const [newCheckData, setNewCheckData] = useState({ cardNumber: "" });
     const [modalError, setModalError] = useState("");
     const [allProducts, setAllProducts] = useState([]);
+    const [cashierInfo, setCashierInfo] = useState(null);
 
 
     useEffect(() => {
         axios.get("http://localhost:5112/api/employees/me", { withCredentials: true })
             .then(res => {
                 setCashierId(res.data.idEmployee);
+                setCashierInfo(res.data);
             })
             .catch(() => setError("Не вдалося отримати інформацію про користувача"));
     }, []);
@@ -141,7 +143,7 @@ export default function CashierCheckPage() {
             const html = `
             <html>
             <head>
-                <title>Звіт про чеки касира</title>
+                <h2>Звіт про всі чеки касира: ${cashierInfo?.surname || ""} ${cashierInfo?.name || ""} ${cashierInfo?.patronymic || ""}</h2>
                 <style>
                     body { font-family: sans-serif; padding: 20px; }
                     h4 { margin-bottom: 0.2em; }

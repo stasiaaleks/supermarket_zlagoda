@@ -61,7 +61,7 @@ export default function ProductsPage() {
             const payload = {
                 ...form,
                 categoryNumber: parseInt(form.categoryNumber, 10),
-                idProduct: parseInt(form.idProduct, 10), // на випадок, якщо він теж приходить як рядок
+                idProduct: parseInt(form.idProduct, 10),
             };
 
             if (editMode) {

@@ -13,18 +13,26 @@ export default function ChecksPage() {
     const [error, setError] = useState("");
     const [analyticsMessage, setAnalyticsMessage] = useState("");
     const [storeProducts, setStoreProducts] = useState([]);
+    const [employeeMap, setEmployeeMap] = useState({});
     const printRef = useRef();
 
     useEffect(() => {
-        axios.get("http://localhost:5112/api/employees/cashiers", { withCredentials: true })
-            .then(res => setCashiers(res.data))
+        axios.get("http://localhost:5112/api/employees", { withCredentials: true })
+            .then(res => {
+                setCashiers(res.data);
+                const map = {};
+                res.data.forEach(e => {
+                    map[e.idEmployee.trim().toUpperCase()] = `${e.surname} ${e.name}`;
+                });
+                setEmployeeMap(map);
+            })
             .catch(() => setError("Не вдалося завантажити касирів"));
     }, []);
 
     useEffect(() => {
         fetchChecks();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [])
 
     useEffect(() => {
         axios.get("http://localhost:5112/api/store-products", { withCredentials: true })
@@ -260,6 +268,14 @@ export default function ChecksPage() {
                     <button className="btn btn-outline-secondary" onClick={handlePrint}>Друк</button>
                 </div>
             </div>
+            <div className="mb-4">
+                <button
+                    className="btn btn-outline-info w-100"
+                    onClick={() => window.location.href = "analytics"}
+                >
+                    Подивитись аналітику
+                </button>
+            </div>
 
 
             {totalSum !== null && (
@@ -284,7 +300,7 @@ export default function ChecksPage() {
                         <React.Fragment key={i}>
                             <tr>
                                 <td>{check.checkNumber}</td>
-                                <td>{check.idEmployee}</td>
+                                <td>{employeeMap[check.idEmployee]}</td>
                                 <td>{check.cardNumber || "-"}</td>
                                 <td>{new Date(check.printDate).toLocaleString()}</td>
                                 <td>{check.sumTotal.toFixed(2)} грн</td>
@@ -330,7 +346,6 @@ export default function ChecksPage() {
             <div className="bg-light border rounded p-3 mt-5">
                 <h5 className="mb-4">Аналітика продажів</h5>
 
-                {/* 1. Сума по вибраному касиру */}
                 <form className="row g-3 align-items-end mb-4" onSubmit={async (e) => {
                     e.preventDefault();
                     if (!selectedCashier || !startDate || !endDate) return setAnalyticsMessage("Оберіть касира і період");
@@ -363,7 +378,6 @@ export default function ChecksPage() {
                     </div>
                 </form>
 
-                {/* 2. Загальна сума всіх продажів */}
                 <form className="row g-3 align-items-end mb-4" onSubmit={async (e) => {
                     e.preventDefault();
                     if (!startDate || !endDate) return setAnalyticsMessage("Оберіть період");
@@ -387,7 +401,6 @@ export default function ChecksPage() {
                     </div>
                 </form>
 
-                {/* 3. Кількість проданого товару */}
                 <form className="row g-3 align-items-end mb-3" onSubmit={async (e) => {
                     e.preventDefault();
                     const upc = document.getElementById("product-upc").value.trim();

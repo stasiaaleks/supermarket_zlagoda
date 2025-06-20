@@ -11,13 +11,19 @@ export default function StoreProductsPage() {
         productName: "",
         characteristics: "",
         sellingPrice: "",
-        productsNumber: "",
-        promotionalProduct: false
+        productsNumber: ""
     });
     const [editMode, setEditMode] = useState(false);
+    const [allProducts, setAllProducts] = useState([]);
+    const [showPromoModal, setShowPromoModal] = useState(false);
+    const [promoForm, setPromoForm] = useState({ baseUpc: "", newUpc: "", quantity: "" });
+    const [sortBy, setSortBy] = useState("products_number");
     const printRef = useRef();
 
-    useEffect(() => { fetchAll(); }, []);
+    useEffect(() => {
+        fetchAll();
+        fetchProductList();
+    }, []);
 
     const fetchAll = async () => {
         try {
@@ -28,9 +34,18 @@ export default function StoreProductsPage() {
         }
     };
 
+    const fetchProductList = async () => {
+        try {
+            const res = await axios.get("http://localhost:5112/api/products", { withCredentials: true });
+            setAllProducts(res.data);
+        } catch {
+            setError("Помилка при завантаженні списку товарів");
+        }
+    };
+
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setForm(prev => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
     };
 
     const handleEdit = (product) => {
@@ -51,17 +66,20 @@ export default function StoreProductsPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const selectedProduct = allProducts.find(p => p.productName === form.productName);
             const dto = {
-                ...form,
+                upc: form.upc,
+                idProduct: selectedProduct?.idProduct,
                 sellingPrice: parseFloat(form.sellingPrice),
                 productsNumber: parseInt(form.productsNumber),
+                promotionalProduct: false
             };
             if (editMode) {
                 await axios.put("http://localhost:5112/api/store-products", dto, { withCredentials: true });
             } else {
                 await axios.post("http://localhost:5112/api/store-products", dto, { withCredentials: true });
             }
-            setForm({ upc: "", productName: "", characteristics: "", sellingPrice: "", productsNumber: "", promotionalProduct: false });
+            setForm({ upc: "", productName: "", characteristics: "", sellingPrice: "", productsNumber: "" });
             setEditMode(false);
             fetchAll();
         } catch {
@@ -72,10 +90,10 @@ export default function StoreProductsPage() {
     const handleFilter = async () => {
         try {
             const params = {};
+            params.sortBy = sortBy === "product_name" ? "ProductName" : "ProductsNumber";
             if (filter.productName) params.productName = filter.productName;
             if (filter.categoryName) params.categoryName = filter.categoryName;
             if (filter.upc) {
-                // Пошук за конкретним UPC
                 const res = await axios.get(`http://localhost:5112/api/store-products/${filter.upc}`, { withCredentials: true });
                 setProducts([res.data]);
                 return;
@@ -92,6 +110,34 @@ export default function StoreProductsPage() {
         }
     };
 
+    const handlePromoChange = (e) => {
+        const { name, value } = e.target;
+        setPromoForm(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleCreatePromo = async () => {
+        try {
+            const base = products.find(p => p.upc === promoForm.baseUpc);
+            if (!base) return alert("Базовий товар не знайдено");
+
+            const baseProduct = allProducts.find(p => p.productName === base.productName);
+            const dto = {
+                upc: base.upc,
+                upcProm: promoForm.newUpc,
+                idProduct: baseProduct?.idProduct || "",
+                sellingPrice: +(base.sellingPrice * 0.8).toFixed(2),
+                productsNumber: parseInt(promoForm.quantity),
+                promotionalProduct: true,
+            };
+            await axios.post("http://localhost:5112/api/store-products", dto, { withCredentials: true });
+            setShowPromoModal(false);
+            setPromoForm({ baseUpc: "", newUpc: "", quantity: "" });
+            fetchAll();
+        } catch {
+            setError("Помилка при створенні акційного товару");
+        }
+    };
+
     const handlePrint = () => {
         const printWindow = window.open("", "_blank", "width=800,height=600");
         if (!printWindow) return;
@@ -102,8 +148,7 @@ export default function StoreProductsPage() {
 
         const html = `
             <html lang="uk">
-            <head>
-                <title>Звіт по товарах</title>
+            <head><title>Звіт по товарах</title>
                 <style>
                     body { font-family: sans-serif; padding: 20px; }
                     table { width: 100%; border-collapse: collapse; }
@@ -144,7 +189,25 @@ export default function StoreProductsPage() {
                     <input name="upc" value={form.upc} onChange={handleChange} className="form-control" placeholder="UPC" required />
                 </div>
                 <div className="col-md-2">
-                    <input name="productName" value={form.productName} onChange={handleChange} className="form-control" placeholder="Назва" required />
+                    <select
+                        name="productName"
+                        value={form.productName}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const selectedProduct = allProducts.find(p => p.productName === selectedName);
+                            setForm(prev => ({
+                                ...prev,
+                                productName: selectedName,
+                                characteristics: selectedProduct?.characteristics || ""
+                            }));
+                        }}
+                        className="form-select"
+                        required>
+                        <option value="">Оберіть товар</option>
+                        {allProducts.map(p => (
+                            <option key={p.idProduct} value={p.productName}>{p.productName} ({p.categoryName})</option>
+                        ))}
+                    </select>
                 </div>
                 <div className="col-md-2">
                     <input name="characteristics" value={form.characteristics} onChange={handleChange} className="form-control" placeholder="Характеристики" />
@@ -155,11 +218,7 @@ export default function StoreProductsPage() {
                 <div className="col-md-2">
                     <input name="productsNumber" type="number" value={form.productsNumber} onChange={handleChange} className="form-control" placeholder="Кількість" required />
                 </div>
-                <div className="col-md-1 form-check d-flex align-items-center">
-                    <input name="promotionalProduct" type="checkbox" checked={form.promotionalProduct} onChange={handleChange} className="form-check-input me-2" />
-                    <label className="form-check-label">Акція</label>
-                </div>
-                <div className="col-md-1 d-grid">
+                <div className="col-md-2 d-grid">
                     <button type="submit" className="btn btn-success">{editMode ? "Оновити" : "Додати"}</button>
                 </div>
             </form>
@@ -177,6 +236,17 @@ export default function StoreProductsPage() {
                         <option value="regular">Не акційні</option>
                     </select>
                 </div>
+                <div className="col-md-2">
+                    <label className="form-label">Сортувати за</label>
+                    <select
+                        className="form-select"
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                    >
+                        <option value="products_number">Кількістю</option>
+                        <option value="product_name">Назвою</option>
+                    </select>
+                </div>
                 <div className="col-md-2 d-grid">
                     <button type="submit" className="btn btn-outline-dark">Фільтрувати</button>
                 </div>
@@ -184,6 +254,7 @@ export default function StoreProductsPage() {
                     <button type="button" className="btn btn-secondary" onClick={() => {
                         setFilter({ productName: "", categoryName: "", upc: "" });
                         setPromoType("");
+                        setSortBy("product_number");
                         fetchAll();
                     }}>Очистити</button>
                 </div>
@@ -213,13 +284,45 @@ export default function StoreProductsPage() {
                             <td>{p.promotionalProduct ? "Так" : "Ні"}</td>
                             <td>
                                 <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(p)}>Редагувати</button>
-                                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(p.upc)}>Видалити</button>
+                                <button className="btn btn-sm btn-outline-danger me-2" onClick={() => handleDelete(p.upc)}>Видалити</button>
+                                {!p.promotionalProduct && (
+                                    <button className="btn btn-sm btn-outline-warning" onClick={() => setPromoForm({ baseUpc: p.upc, newUpc: "", quantity: "" }) || setShowPromoModal(true)}>
+                                        Зробити акційним
+                                    </button>
+                                )}
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
             </div>
+
+            {showPromoModal && (
+                <div className="modal d-block" tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Створення акційного товару</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowPromoModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="mb-3">
+                                    <label className="form-label">Новий UPC (акційний)</label>
+                                    <input type="text" className="form-control" name="newUpc" value={promoForm.newUpc} onChange={handlePromoChange} />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Кількість</label>
+                                    <input type="number" className="form-control" name="quantity" value={promoForm.quantity} onChange={handlePromoChange} />
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowPromoModal(false)}>Скасувати</button>
+                                <button type="button" className="btn btn-primary" onClick={handleCreatePromo}>Створити</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

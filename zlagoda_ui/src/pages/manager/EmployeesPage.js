@@ -22,19 +22,88 @@ export default function EmployeesPage() {
     const [error, setError] = useState("");
     const printRef = useRef();
     const navigate = useNavigate();
-
+    const [userMap, setUserMap] = useState({});
     const [surnameSearch, setSurnameSearch] = useState("");
     const [contacts, setContacts] = useState([]);
     const contactsPrintRef = useRef();
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
+    const [registerData, setRegisterData] = useState({ idEmployee: "", username: "", password: "" });
+    const [registrationMessage, setRegistrationMessage] = useState("");
+    const [accountStatusMap, setAccountStatusMap] = useState({});
 
     useEffect(() => {
         fetchEmployees();
     }, []);
 
+    useEffect(() => {
+        fetchUserMap();
+    }, []);
+
+    const fetchUserMap = async () => {
+        try {
+            const res = await axios.get("http://localhost:5112/api/employees/users", { withCredentials: true });
+            const map = {};
+            res.data.forEach(user => map[user.idEmployee] = true);
+            setUserMap(map);
+        } catch (err) {
+            console.error("Помилка при завантаженні користувачів");
+        }
+    };
+
+
+    const handleOpenRegisterModal = (emp) => {
+        setRegisterData({ idEmployee: emp.idEmployee, username: "", password: "" });
+        setShowRegisterModal(true);
+    };
+
+    const handleRegisterSubmit = async () => {
+        try {
+            await axios.post("http://localhost:5112/register/existing-employee", registerData, { withCredentials: true });
+            setShowRegisterModal(false);
+            setRegistrationMessage(`Користувача з прізвищем ${getSurnameById(registerData.idEmployee)} зареєстровано`);
+            fetchUserMap();
+        } catch (err) {
+            alert("Помилка при реєстрації");
+        }
+    };
+
+    const getSurnameById = (id) => {
+        const emp = employees.find(e => e.idEmployee === id);
+        return emp?.surname || "";
+    };
+
+    const fetchAccountsStatus = async () => {
+        const status = {};
+        for (const emp of employees) {
+            try {
+                const res = await axios.get(`http://localhost:5112/api/employees/${emp.idEmployee}`, { withCredentials: true });
+                status[emp.idEmployee] = res.data.hasAccount; // ← обов'язково перевір, що res.data.hasAccount справді існує
+            } catch (err) {
+                console.error(`Помилка при завантаженні акаунту для ${emp.idEmployee}`);
+            }
+        }
+        setAccountStatusMap(status);
+    };
+
     const fetchEmployees = async () => {
         try {
             const res = await axios.get("http://localhost:5112/api/employees", { withCredentials: true });
             setEmployees(res.data);
+
+            // Після оновлення списку працівників — завантажуємо статус акаунтів
+            const status = {};
+            for (const emp of res.data) {
+                try {
+                    const accountRes = await axios.get(`http://localhost:5112/api/employees/${emp.idEmployee}`, {
+                        withCredentials: true
+                    });
+                    status[emp.idEmployee] = accountRes.data.hasAccount;
+                } catch {
+                    status[emp.idEmployee] = false; // або undefined
+                }
+            }
+            setAccountStatusMap(status);
+
         } catch (err) {
             setError("Помилка при завантаженні працівників");
         }
@@ -101,7 +170,13 @@ export default function EmployeesPage() {
 
     const handlePrint = () => {
         const cloned = printRef.current.cloneNode(true);
-        cloned.querySelectorAll("th:last-child, td:last-child").forEach(el => el.remove());
+        cloned.querySelectorAll("tr").forEach(row => {
+            const cells = row.querySelectorAll("th, td");
+            if (cells.length >= 2) {
+                cells[cells.length - 1].remove(); // "Акаунт"
+                cells[cells.length - 2].remove(); // "Дії"
+            }
+        });
         const content = cloned.innerHTML;
 
         const printWindow = window.open("", "_blank", "width=800,height=600");
@@ -253,6 +328,9 @@ export default function EmployeesPage() {
                     />
                     <button onClick={handleFindContacts} className="btn btn-dark">Знайти контакти</button>
                 </div>
+                {registrationMessage && (
+                    <div className="alert alert-success">{registrationMessage}</div>
+                )}
 
                 {contacts.length > 0 && (
                     <div ref={contactsPrintRef} className="bg-white p-3 mb-4 shadow-sm rounded border">
@@ -302,7 +380,8 @@ export default function EmployeesPage() {
                             <th>Місто</th>
                             <th>Вулиця</th>
                             <th>Індекс</th>
-                            <th>Дії</th>
+                            <th className="d-print-none">Дії</th>
+                            <th className="d-print-none">Акаунт</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -319,9 +398,16 @@ export default function EmployeesPage() {
                                 <td>{emp.city}</td>
                                 <td>{emp.street}</td>
                                 <td>{emp.zipCode}</td>
-                                <td>
+                                <td className="d-print-none">
                                     <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(emp)}>Редагувати</button>
-                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(emp.idEmployee)}>Видалити</button>
+                                    <button className="btn btn-sm btn-outline-danger me-2" onClick={() => handleDelete(emp.idEmployee)}>Видалити</button>
+                                </td>
+                                <td className="d-print-none">
+                                {accountStatusMap[emp.idEmployee] ? (
+                                    <span className="text-success fw-semi">Зареєстровано</span>
+                                    ) : (
+                                    <button className="btn btn-sm btn-outline-success" onClick={() => handleOpenRegisterModal(emp)}>Зареєструвати</button>
+                                )}
                                 </td>
                             </tr>
                         ))}
@@ -329,6 +415,33 @@ export default function EmployeesPage() {
                     </table>
                 </div>
             </div>
+            {showRegisterModal && (
+                <div className="modal d-block bg-dark bg-opacity-50">
+                    <div className="modal-dialog">
+                        <div className="modal-content p-3">
+                            <h5>Реєстрація акаунта</h5>
+                            <input
+                                type="text"
+                                className="form-control mb-2"
+                                placeholder="Ім'я користувача"
+                                value={registerData.username}
+                                onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
+                            />
+                            <input
+                                type="password"
+                                className="form-control mb-2"
+                                placeholder="Пароль"
+                                value={registerData.password}
+                                onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                            />
+                            <div className="d-flex justify-content-end gap-2">
+                                <button className="btn btn-secondary" onClick={() => setShowRegisterModal(false)}>Скасувати</button>
+                                <button className="btn btn-primary" onClick={handleRegisterSubmit}>Зареєструвати</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

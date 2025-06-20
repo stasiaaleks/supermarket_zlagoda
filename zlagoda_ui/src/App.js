@@ -17,6 +17,7 @@ import CashierStoreProductPage from "./pages/cashier/CashierStoreProductPage";
 import CashierProductsPage from "./pages/cashier/CashierProductsPage";
 import CashierCustomerPage from "./pages/cashier/CashierCustomerCardsPage";
 import ChangePasswordPage from "./pages/shared/ChangePasswordPage";
+import AnalyticsPage from "./pages/manager/AnalyticsPage";
 
 export default function App() {
     return (
@@ -75,6 +76,15 @@ export default function App() {
                     element={
                         <PrivateRoute role="Manager">
                             <ChangePasswordPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/manager/analytics"
+                    element={
+                        <PrivateRoute role="Manager">
+                            <AnalyticsPage />
                         </PrivateRoute>
                     }
                 />
