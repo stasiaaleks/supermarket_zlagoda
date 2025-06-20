@@ -68,7 +68,7 @@ public class ProductController : ControllerBase
     [HttpDelete("{id}")]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _productService.DeleteById(id);
         if (!deleted) return BadRequest();

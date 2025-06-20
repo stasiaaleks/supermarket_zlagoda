@@ -13,7 +13,7 @@ public interface IProductService
     Task<ProductWithCategoryDto> GetById(string id);
     Task<string> CreateProduct(CreateProductDto dto);
     Task<string> UpdateById(ProductDto dto);
-    Task<bool> DeleteById(string number);
+    Task<bool> DeleteById(int id);
 }
 
 public class ProductService : IProductService
@@ -58,9 +58,16 @@ public class ProductService : IProductService
         return updatedId;
     }
 
-    public async Task<bool> DeleteById(string id)
+    public async Task<bool> DeleteById(int id)
     {
-        var rows = await _productRepo.DeleteByIdAsync(_queryProvider.DeleteById, id);
+        var param = new { Id = id };
+        var existingEntity = await _productRepo.GetSingleAsync(_queryProvider.GetById, param);
+        
+        if (existingEntity == null)
+            throw new ArgumentException($"No product with id {id} was found.");
+
+        var rows = await _productRepo.DeleteAsync(_queryProvider.DeleteById, param);
         return rows > 0;
     }
+
 }
