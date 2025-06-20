@@ -9,8 +9,7 @@ FROM employee e
          LEFT JOIN "check" c ON e.id_employee = c.id_employee
          LEFT JOIN sale s ON c.check_number = s.check_number
          LEFT JOIN store_product sp ON s.upc = sp.upc
-WHERE e.role = 'cashier'
-  AND e.id_employee = @IdEmployee
+WHERE e.role = 'Cashier' AND e.id_employee = @IdEmployee
 GROUP BY
     e.id_employee,
     e.surname,
