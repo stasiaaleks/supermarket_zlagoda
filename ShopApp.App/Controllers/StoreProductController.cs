@@ -21,7 +21,7 @@ public class StoreProductController : ControllerBase
 
     [HttpGet]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
-    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductInfoDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         var products = await _productService.GetAll();
@@ -30,7 +30,7 @@ public class StoreProductController : ControllerBase
     
     [HttpGet("{upc}")]
     [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
-    [ProducesResponseType(typeof(StoreProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(StoreProductInfoDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByUpc([FromRoute] string upc)
     {
         var dto = await _productService.GetProductInfoByUpc(upc);
@@ -39,7 +39,7 @@ public class StoreProductController : ControllerBase
     
     [HttpGet("filter")]
     [Authorize]
-    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductInfoDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FilterProducts([FromQuery] StoreProductSearchCriteria searchCriteria)
     {
         var products = await _productService.Filter(searchCriteria);
@@ -48,7 +48,7 @@ public class StoreProductController : ControllerBase
     
     [HttpGet("promotional")]
     [Authorize]
-    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductInfoDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FilterPromotionalProducts([FromQuery] StoreProductSearchCriteria searchCriteria)
     {
         var products = await _productService.GetFilteredPromotional(searchCriteria);
@@ -57,7 +57,7 @@ public class StoreProductController : ControllerBase
     
     [HttpGet("regular")]
     [Authorize]
-    [ProducesResponseType(typeof(IEnumerable<StoreProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<StoreProductInfoDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> FilterRegularProducts([FromQuery] StoreProductSearchCriteria searchCriteria)
     {
         var products = await _productService.GetFilteredRegular(searchCriteria);
@@ -67,7 +67,7 @@ public class StoreProductController : ControllerBase
     [HttpPost]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create([FromBody] StoreProductDto dto)
+    public async Task<IActionResult> Create([FromBody] SaveStoreProductDto dto)
     {
         var id = await _productService.CreateStoreProduct(dto);
         if (string.IsNullOrEmpty(id)) return BadRequest();
@@ -77,7 +77,7 @@ public class StoreProductController : ControllerBase
     [HttpPut]
     [VerifyRole(EmployeeRoles.Manager)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Update([FromBody] StoreProductDto dto)
+    public async Task<IActionResult> Update([FromBody] SaveStoreProductDto dto)
     {
         var id = await _productService.UpdateStoreProduct(dto);
         if (string.IsNullOrEmpty(id)) return BadRequest();

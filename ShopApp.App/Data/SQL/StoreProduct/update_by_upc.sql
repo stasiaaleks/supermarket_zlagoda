@@ -4,4 +4,5 @@ SET upc_prom = @UPCProm,
     selling_price = @SellingPrice,
     products_number = @ProductsNumber,
     promotional_product = @PromotionalProduct
-WHERE upc = @UPC;
+WHERE upc = @UPC
+RETURNING upc;

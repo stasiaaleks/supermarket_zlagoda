@@ -8,11 +8,10 @@ public interface IPasswordHasher
     bool VerifyPassword(string password, string storedHash, string storedSalt);
 }
 
-// TODO: double-check hashing algorithm
 public class Pbkdf2PasswordHasher : IPasswordHasher
 {
-    private const int SaltSize = 16; // 128-bit
-    private const int HashSize = 32; // 256-bit
+    private const int SaltSize = 16; 
+    private const int HashSize = 32; 
     private const int Iterations = 100_000;
     
     public (string hash, string salt) HashPassword(string password)

@@ -9,7 +9,7 @@ namespace ShopApp.Services.Auth;
 public interface IAuthService
 {
     Task<User?> Authenticate(string username, string password);
-    Task<User> RegisterUserWithEmployee(RegisterDto dto);
+    Task<User> CreateAccount(RegisterDto dto);
     Task<User> RegisterForExistingEmployee(CreateUserDto dto);
     Task<User?> ChangePassword(LoginDto dto);
 }
@@ -40,8 +40,8 @@ public class AuthService: IAuthService
         return isValid ? user : null;
     }
 
-    // TODO: consider moving to UserService
-    public async Task<User> RegisterUserWithEmployee(RegisterDto dto)
+    // create a new user + corresponding employee
+    public async Task<User> CreateAccount(RegisterDto dto)
     {
         var employeeDto = _mapper.Map<CreateEmployeeDto>(dto);
         int? newUserId;
