@@ -22,7 +22,7 @@ WHERE e.surname != @Surname
     FROM check AS cp
              INNER JOIN sale AS sp ON cp.check_number = sp.check_number
     WHERE cp.id_employee IN (
-        SELECT id_employeen
+        SELECT id_employee
         FROM employee
         WHERE surname = @Surname
     )
