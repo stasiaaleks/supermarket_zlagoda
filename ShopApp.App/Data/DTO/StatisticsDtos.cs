@@ -23,7 +23,7 @@ public class ProductsSoldOnlyPromo
     public string UPC { get; set; }
     public string IdProduct { get; set; }
     public string ProductName { get; set; }
-    public string TotalQuantity { get; set; }
+    public int TotalQuantity { get; set; }
 }
 
 public class CashierChecksCountData
@@ -32,4 +32,16 @@ public class CashierChecksCountData
     public string Name { get; set; }
     public string Surname { get; set; }
     public int ChecksAmount { get; set; }
+}
+public class CashierProductsCertainCategory
+{
+    public string Name { get; set; }
+    public string Surname { get; set; }
+}
+public class CustomersWithNumCategories
+{
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public int CategoryCount { get; set; }
+    public int ProductCount { get; set; }
 }

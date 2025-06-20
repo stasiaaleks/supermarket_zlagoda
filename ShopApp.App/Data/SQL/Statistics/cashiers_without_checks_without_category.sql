@@ -1,4 +1,4 @@
-SELECT e.surname, e.name, e.role
+SELECT e.surname, e.name
 FROM employee e
 WHERE e.role = 'Cashier'
   AND EXISTS (
@@ -17,6 +17,6 @@ WHERE e.role = 'Cashier'
                  JOIN product p ON sp.id_product = p.id_product
                  JOIN category cat ON p.category_number = cat.category_number
         WHERE s.check_number = c.check_number
-          AND cat.category_name = :categoryName
+          AND cat.category_name = @categoryName
     )
 );

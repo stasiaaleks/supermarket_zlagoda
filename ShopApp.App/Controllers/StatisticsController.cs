@@ -15,9 +15,9 @@ public class StatisticsController: ControllerBase
         _statisticsService = statisticsService;
     }
     
-    [HttpGet("cashier-prom-products/{idEmployee}")]
-    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCashierPromProductsData([FromRoute] string idEmployee)
+    [HttpGet("cashier-prom-products/")]
+    [ProducesResponseType(typeof(IEnumerable<CashierPromProductsNumericData>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCashierPromProductsData([FromQuery] string idEmployee)
     {
         var data = await _statisticsService.GetPromProductsSumQuantityByCashier(idEmployee);
         return Ok(data);
@@ -32,7 +32,7 @@ public class StatisticsController: ControllerBase
     }
     
     [HttpGet("cashiers-min-checks-products/")]
-    [ProducesResponseType(typeof(IEnumerable<CashierChecksCountData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ProductsSoldOnlyPromo>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCashiersMinProductsMinChecks([FromQuery] int minProducts, int minChecks)
     {
         var data = await _statisticsService.GetCashiersMinProductsMinChecks(minProducts, minChecks);
@@ -40,11 +40,25 @@ public class StatisticsController: ControllerBase
     }
     
     [HttpGet("sold-only-promo-products")]
-    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<ProductsSoldOnlyPromo>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProductsSoldOnlyPromo()
     {
         var data = await _statisticsService.GetProductsSoldOnlyPromo();
         return Ok(data);
     }
-        
+      
+    [HttpGet("cashiers-sold-products-certain-category/")]
+    [ProducesResponseType(typeof(IEnumerable<CashierProductsCertainCategory>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCashiersProductsCertainCategory([FromQuery] string categoryName)
+    {
+        var data = await _statisticsService.GetCashierProductsCertainCategory(categoryName);
+        return Ok(data);
+    }
+    [HttpGet("customers-with-more-category-num")]
+    [ProducesResponseType(typeof(IEnumerable<CustomersWithNumCategories>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCustomersWithNumCategories([FromQuery] int categoryNum)
+    {
+        var data = await _statisticsService.GetCustomersWithNumCategories(categoryNum);
+        return Ok(data);
+    }
 }

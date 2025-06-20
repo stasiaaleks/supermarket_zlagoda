@@ -10,5 +10,5 @@ FROM customer_card cc
          JOIN product p ON sp.id_product = p.id_product
          JOIN category cat ON p.category_number = cat.category_number
 GROUP BY cc.card_number, cc.cust_surname, cc.cust_name
-HAVING COUNT(DISTINCT cat.category_name) >= :minCategories
+HAVING COUNT(DISTINCT cat.category_name) >= @minCategories
 ORDER BY category_count DESC, total_items_bought DESC;

@@ -8,10 +8,12 @@ namespace ShopApp.Services;
 
 public interface IStatisticsService
 {
-    Task<CashierPromProductsNumericData> GetPromProductsSumQuantityByCashier(string idEmployee);
+    Task<IEnumerable<CashierPromProductsNumericData>> GetPromProductsSumQuantityByCashier(string idEmployee);
     Task<IEnumerable<CashierCheckData>> GetCashiersWithSameChecks(string surname);
     Task<IEnumerable<CashierChecksCountData>> GetCashiersMinProductsMinChecks(int minProducts, int minChecks);
     Task<IEnumerable<ProductsSoldOnlyPromo>> GetProductsSoldOnlyPromo();
+    Task<IEnumerable<CashierProductsCertainCategory>> GetCashierProductsCertainCategory(string categoryName);
+    Task<IEnumerable<CustomersWithNumCategories>> GetCustomersWithNumCategories(int categoryCount);
 
 }
 
@@ -26,11 +28,12 @@ public class StatisticsService: IStatisticsService
         _queryProvider = queryProvider;
     }
 
-    public async Task<CashierPromProductsNumericData> GetPromProductsSumQuantityByCashier(string idEmployee)
+    public async Task<IEnumerable<CashierPromProductsNumericData>> GetPromProductsSumQuantityByCashier(string idEmployee)
     {
         var parameters = new { IdEmployee = idEmployee };
-        return await _repository.GetSingleAsync<CashierPromProductsNumericData>(_queryProvider.GetPromProductsDataByCashier, parameters);
+        return await _repository.GetAllAsync<CashierPromProductsNumericData>(_queryProvider.GetPromProductsDataByCashier, parameters);
     }
+
 
     public async Task<IEnumerable<CashierCheckData>> GetCashiersWithSameChecks(string surname)
     {
@@ -48,4 +51,15 @@ public class StatisticsService: IStatisticsService
     {
         return await _repository.GetAllAsync<ProductsSoldOnlyPromo>(_queryProvider.GetProductsSoldOnlyPromo);
     }
+    public async Task<IEnumerable<CashierProductsCertainCategory>> GetCashierProductsCertainCategory(string categoryName)
+    {
+        var parameters = new { CategoryName = categoryName };
+        return await _repository.GetAllAsync<CashierProductsCertainCategory>(_queryProvider.GetCashiersProductsCertainCategory, parameters);
+    }
+    
+    public async Task<IEnumerable<CustomersWithNumCategories>> GetCustomersWithNumCategories(int categoryCount)
+    {
+        var parameters = new { CategoryCount = categoryCount };
+        return await _repository.GetAllAsync<CustomersWithNumCategories>(_queryProvider.GetCustomersWithNumCategories, parameters);
+    }  
 }
