@@ -16,6 +16,7 @@ public static class BusinessLogicServiceCollectionExtension
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ICustomerCardService, CustomerCardService>();
         
+        services.AddScoped<IStatisticsService, StatisticsService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         return services;

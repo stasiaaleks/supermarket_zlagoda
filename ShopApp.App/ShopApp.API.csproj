@@ -39,6 +39,7 @@
     <EmbeddedResource Include="Data\SQL\CustomerCard\*.sql" />
     <EmbeddedResource Include="Data\SQL\Sale\*.sql" />
     <EmbeddedResource Include="Data\SQL\StoreProduct\*.sql" />
+    <EmbeddedResource Include="Data\SQL\Statistics\*.sql" />
   </ItemGroup>
 
 </Project>
