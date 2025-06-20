@@ -5,6 +5,7 @@ using ShopApp.Services;
 namespace ShopApp.Controllers;
 
 [ApiController]
+[Route("api/statistics")]
 public class StatisticsController: ControllerBase
 {
     private readonly IStatisticsService _statisticsService;
