@@ -58,12 +58,25 @@ export default function ProductsPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const payload = {
+                ...form,
+                categoryNumber: parseInt(form.categoryNumber, 10),
+                idProduct: parseInt(form.idProduct, 10), // на випадок, якщо він теж приходить як рядок
+            };
+
             if (editMode) {
-                await axios.put(`http://localhost:5112/api/products/${form.idProduct}`, form, { withCredentials: true });
+                await axios.put("http://localhost:5112/api/products", payload, { withCredentials: true });
             } else {
-                await axios.post("http://localhost:5112/api/products", form, { withCredentials: true });
+                await axios.post("http://localhost:5112/api/products", payload, { withCredentials: true });
             }
-            setForm({ idProduct: "", categoryNumber: "", productName: "", characteristics: "" });
+
+            setForm({
+                idProduct: "",
+                categoryNumber: "",
+                productName: "",
+                manufacturer: "",
+                characteristics: ""
+            });
             setEditMode(false);
             fetchProducts();
         } catch (err) {

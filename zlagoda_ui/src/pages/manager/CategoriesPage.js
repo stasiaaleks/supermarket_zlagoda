@@ -160,18 +160,18 @@ export default function CategoriesPage() {
                     </div>
 
                     <div className="col-md-2">
-                        <button type="submit" className="btn btn-success w-100">
+                        <button type="submit" className="btn btn-success w-200">
                             {editMode ? "Зберегти" : "Додати"}
                         </button>
                     </div>
                 </form>
 
-                <div ref={printRef} className="bg-white p-3 shadow-sm rounded border">
-                    <table className="table table-hover">
+                <div ref={printRef} className="bg-white p-3 shadow-sm rounded border" style={{ maxWidth: "10000px", margin: "0 auto" }}>
+                    <table className="table table-hover table-bordered">
                         <thead className="table-light">
                         <tr>
-                            <th>Назва</th>
-                            <th>Дії</th>
+                            <th style={{ width: "80%" }}>Назва</th>
+                            <th style={{ width: "20%" }}>Дії</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -189,6 +189,7 @@ export default function CategoriesPage() {
                         </tbody>
                     </table>
                 </div>
+
             </div>
         </div>
     );

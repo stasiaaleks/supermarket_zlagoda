@@ -1,3 +1,4 @@
+using System.Transactions;
 using AutoMapper;
 using ShopApp.DAL.Repository;
 using ShopApp.Data.DTO;
@@ -8,15 +9,15 @@ namespace ShopApp.Services;
 
 public interface IStoreProductService
 {
-    Task<IEnumerable<StoreProductDto>> GetAll();
+    Task<IEnumerable<StoreProductInfoDto>> GetAll();
     Task<StoreProductPriceNumberDto> GetPriceAndNumberByUpc(string upc);
-    Task<StoreProductDto> GetProductInfoByUpc(string upc);
-    Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria);
-    Task<IEnumerable<StoreProductDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria);
-    Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria);
+    Task<StoreProductInfoDto> GetProductInfoByUpc(string upc);
+    Task<IEnumerable<StoreProductInfoDto>> Filter(StoreProductSearchCriteria criteria);
+    Task<IEnumerable<StoreProductInfoDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria);
+    Task<IEnumerable<StoreProductInfoDto>> GetFilteredRegular(StoreProductSearchCriteria criteria);
     Task<string> UpdateAmount(int delta, string productUpc);
-    Task<string> CreateStoreProduct(StoreProductDto dto);
-    Task<string> UpdateStoreProduct(StoreProductDto dto);
+    Task<string?> CreateStoreProduct(SaveStoreProductDto infoDto);
+    Task<string> UpdateStoreProduct(SaveStoreProductDto infoDto);
     Task<bool> DeleteStoreProduct(string upc);
 }
 
@@ -33,9 +34,9 @@ public class StoreProductService : IStoreProductService
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<StoreProductDto>> GetAll()
+    public async Task<IEnumerable<StoreProductInfoDto>> GetAll()
     {
-        var products = await _productRepo.GetAllAsync<StoreProductDto>(_queryProvider.GetAll);
+        var products = await _productRepo.GetAllAsync<StoreProductInfoDto>(_queryProvider.GetAll);
         return products;
     }
 
@@ -45,23 +46,23 @@ public class StoreProductService : IStoreProductService
         return _mapper.Map<StoreProductPriceNumberDto>(product);
     }
 
-    public async Task<StoreProductDto> GetProductInfoByUpc(string upc)
+    public async Task<StoreProductInfoDto> GetProductInfoByUpc(string upc)
     {
-        var product = await _productRepo.GetSingleAsync<StoreProductDto>(_queryProvider.GetProductInfoByUpc, new { UPC = upc });
+        var product = await _productRepo.GetSingleAsync<StoreProductInfoDto>(_queryProvider.GetProductInfoByUpc, new { UPC = upc });
         return product;
     }
     
-    public async Task<IEnumerable<StoreProductDto>> Filter(StoreProductSearchCriteria criteria)
+    public async Task<IEnumerable<StoreProductInfoDto>> Filter(StoreProductSearchCriteria criteria)
     {
         var query = _queryProvider.GetAll;
-        var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
+        var products = await _productRepo.FilterByPredicateAsync<StoreProductInfoDto>(query, criteria);
         return products;
     }
 
-    public async Task<IEnumerable<StoreProductDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria)
+    public async Task<IEnumerable<StoreProductInfoDto>> GetFilteredPromotional(StoreProductSearchCriteria criteria)
     {
         var query = _queryProvider.GetAllPromotional;
-        var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
+        var products = await _productRepo.FilterByPredicateAsync<StoreProductInfoDto>(query, criteria);
         return products;
     }
     public async Task<string> UpdateAmount(int delta, string productUpc)
@@ -78,25 +79,39 @@ public class StoreProductService : IStoreProductService
         return await _productRepo.UpdateAsync<string>(product, query);
     }
     
-    // consider adding SortableCriteria or similar refactoring
-    // to make fetching of promotional/other products (and general filtering usage) cleaner
-    public async Task<IEnumerable<StoreProductDto>> GetFilteredRegular(StoreProductSearchCriteria criteria)
+    public async Task<IEnumerable<StoreProductInfoDto>> GetFilteredRegular(StoreProductSearchCriteria criteria)
     {
         var query = _queryProvider.GetAllRegular;
-        var products = await _productRepo.FilterByPredicateAsync<StoreProductDto>(query, criteria);
+        var products = await _productRepo.FilterByPredicateAsync<StoreProductInfoDto>(query, criteria);
         return products;
     }
-    public async Task<string> CreateStoreProduct(StoreProductDto dto)
+    
+    public async Task<string?> CreateStoreProduct(SaveStoreProductDto dto)
     {
-        var entity = _mapper.Map<StoreProduct>(dto);
-        var result = await _productRepo.InsertAsync<string>(entity, _queryProvider.CreateSingle);
+        string? result;
+        if (dto.PromotionalProduct && dto.UPCProm != null)
+        {
+            result = await CreatePromotionalProduct(dto);
+        }
+        else
+        {
+            result = await CreateRegularProduct(dto);
+        }
+
         return result;
     }
 
-    public async Task<string> UpdateStoreProduct(StoreProductDto dto)
+    public async Task<string> UpdateStoreProduct(SaveStoreProductDto dto)
     {
-        var entity = _mapper.Map<StoreProduct>(dto);
-        var result = await _productRepo.UpdateAsync<string>(entity, _queryProvider.UpdateByUpc);
+        string? result;
+        if (dto.PromotionalProduct)
+        {
+            result = await UpdatePromotional(dto);
+        }
+        else
+        {
+            result = await UpdateRegular(dto);
+        }
         return result;
     }
 
@@ -110,4 +125,90 @@ public class StoreProductService : IStoreProductService
         var rows = await _productRepo.DeleteAsync(_queryProvider.DeleteByUpc, productParams);
         return rows > 0;
     }
+
+    private async Task<StoreProduct?> GetPromotionalByUpc(string upc)
+    {
+        var result = await _productRepo.GetSingleAsync<StoreProduct>(_queryProvider.GetAllPromotionalByUpc, new { UPC = upc });
+        return result;
+    }
+
+    private async Task<string> UpdatePromotional(SaveStoreProductDto dto)
+    {
+        var existing = await GetByUpc(dto.UPC);
+        dto.SellingPrice = existing.SellingPrice; // selling price is immutable for promotional products
+        var entity = _mapper.Map<StoreProduct>(dto);
+        return await _productRepo.UpdateAsync<string>(entity, _queryProvider.UpdateByUpc);
+    }
+
+    private async Task<string> UpdateRegular(SaveStoreProductDto dto)
+    {
+        string? result;
+
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var entity = _mapper.Map<StoreProduct>(dto);
+            var existing = await GetByUpc(dto.UPC);
+
+            result = await _productRepo.UpdateAsync<string>(entity, _queryProvider.UpdateByUpc);
+
+            if (existing.SellingPrice != dto.SellingPrice)
+            {
+                var promotional = await GetPromotionalByUpc(dto.UPC);
+                if (promotional != null)
+                {
+                    promotional.SellingPrice = dto.SellingPrice * 0.8m;
+                    await _productRepo.UpdateAsync<string>(promotional, _queryProvider.UpdateByUpc); 
+                }
+            }
+
+            transaction.Complete();
+        }
+
+        return result;
+    }
+
+    private async Task<StoreProduct> GetByUpc(string upc)
+    {
+        var product = await _productRepo.GetSingleAsync(_queryProvider.GetProductInfoByUpc, new { UPC = upc });
+        if (product == null) throw new ArgumentException("Product was not found to be made promotional");
+        return product;
+    }
+
+    private async Task<string> CreatePromotionalProduct(SaveStoreProductDto dto)
+    {
+        string? result;
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var baseProduct = await GetByUpc(dto.UPC);
+
+            if (baseProduct.SellingPrice * 0.8m != dto.SellingPrice)
+                throw new ArgumentException("Promotional price should be 80% from the base price");
+            
+            var entity = new StoreProduct()
+            {
+                UPC = dto.UPCProm,
+                UPCProm = null,
+                PromotionalProduct = true,
+                ProductsNumber = dto.ProductsNumber,
+                IdProduct = dto.IdProduct,
+                SellingPrice = dto.SellingPrice,
+            };
+            result = await _productRepo.InsertAsync<string>(entity, _queryProvider.CreateSingle);
+            
+            baseProduct.UPCProm = dto.UPCProm;
+            baseProduct.IdProduct = dto.IdProduct;
+            await _productRepo.UpdateAsync<int>(baseProduct, _queryProvider.UpdateByUpc);
+            
+            transaction.Complete();
+        }
+
+        return result;
+    }
+    
+    private async Task<string> CreateRegularProduct(SaveStoreProductDto dto)
+    {
+        var entity = _mapper.Map<StoreProduct>(dto);
+        return await _productRepo.InsertAsync<string>(entity, _queryProvider.CreateSingle);
+    }
+    
 }
