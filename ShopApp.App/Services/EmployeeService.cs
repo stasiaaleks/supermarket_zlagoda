@@ -15,7 +15,7 @@ public interface IEmployeeService
     Task<string> GetEmployeeRole(string id);
     Task<EmployeeDto> GetById(string id);
     Task<EmployeeDto> GetByUsername(string username);
-    Task<EmployeeContactsDto> GetContactsBySurname(string surname);
+    Task<IEnumerable<EmployeeContactsDto>> GetContactsBySurname(string surname);
     Task<string> CreateEmployee(CreateEmployeeDto dto);
     Task<string> UpdateEmployee(EmployeeDto dto);
     Task<bool> DeleteEmployee(string id);
@@ -78,15 +78,15 @@ public class EmployeeService: IEmployeeService
         return _mapper.Map<EmployeeDto>(employee);
     }
 
-    public async Task<EmployeeContactsDto> GetContactsBySurname(string surname) 
+    public async Task<IEnumerable<EmployeeContactsDto>> GetContactsBySurname(string surname) 
     {
         var query = _queryProvider.GetContactsBySurname; 
-        var employeeContacts = await _employeeRepo.GetSingleAsync<EmployeeContactsDto>(query, new { Surname = surname });
+        var employeeContacts = await _employeeRepo.GetAllAsync<EmployeeContactsDto>(query, new { Surname = surname });
         
         if (employeeContacts == null)
             throw new KeyNotFoundException($"Contacts for employee with surname '{surname}' not found.");
         
-        return employeeContacts; // fix check for null
+        return employeeContacts;
     }
 
     public async Task<string> GetEmployeeRole(string id)

@@ -52,7 +52,7 @@ public class EmployeeController : ControllerBase
 
     [HttpGet("contacts")]
     [VerifyRole(EmployeeRoles.Manager)]
-    [ProducesResponseType(typeof(EmployeeContactsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<EmployeeContactsDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployeeContacts([FromQuery] string surname)
     {
         var contactsDto = await _employeeService.GetContactsBySurname(surname);

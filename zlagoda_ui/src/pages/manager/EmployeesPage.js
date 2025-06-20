@@ -54,7 +54,7 @@ export default function EmployeesPage() {
             const res = await axios.get(`http://localhost:5112/api/employees/contacts?surname=${surnameSearch}`, {
                 withCredentials: true,
             });
-            setContacts([res.data]);
+            setContacts(res.data);
         } catch (err) {
             setError("Контакти не знайдено");
         }
