@@ -17,7 +17,7 @@ export default function ChecksPage() {
     const printRef = useRef();
 
     useEffect(() => {
-        axios.get("http://localhost:5112/api/employees", { withCredentials: true })
+        axios.get("http://localhost:5112/api/employees/cashiers", { withCredentials: true })
             .then(res => {
                 setCashiers(res.data);
                 const map = {};
@@ -74,7 +74,6 @@ export default function ChecksPage() {
                 checks = res.data;
             }
 
-            // якщо є sales — зберігаємо їх одразу
             const map = {};
             for (const c of checks) {
                 if (c.sales) {
@@ -192,30 +191,6 @@ export default function ChecksPage() {
         } catch {
             setError("Не вдалося згенерувати звіт");
         }
-    };
-
-    const fetchTotalSumAllCashiers = async (start, end) => {
-        const res = await axios.get("http://localhost:5112/api/checks/sum", {
-            params: { start, end },
-            withCredentials: true
-        });
-        return res.data.totalSum;
-    };
-
-    const fetchTotalSumByCashier = async (cashierId, start, end) => {
-        const res = await axios.get(`http://localhost:5112/api/checks/cashiers/${cashierId}/sum`, {
-            params: { start, end },
-            withCredentials: true
-        });
-        return res.data.totalSum;
-    };
-
-    const fetchTotalSoldProduct = async (upc, start, end) => {
-        const res = await axios.get(`http://localhost:5112/api/sales/${upc}/total`, {
-            params: { start, end },
-            withCredentials: true
-        });
-        return res.data.totalSold;
     };
 
 

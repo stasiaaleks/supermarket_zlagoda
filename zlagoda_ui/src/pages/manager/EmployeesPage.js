@@ -72,25 +72,11 @@ export default function EmployeesPage() {
         return emp?.surname || "";
     };
 
-    const fetchAccountsStatus = async () => {
-        const status = {};
-        for (const emp of employees) {
-            try {
-                const res = await axios.get(`http://localhost:5112/api/employees/${emp.idEmployee}`, { withCredentials: true });
-                status[emp.idEmployee] = res.data.hasAccount; // ← обов'язково перевір, що res.data.hasAccount справді існує
-            } catch (err) {
-                console.error(`Помилка при завантаженні акаунту для ${emp.idEmployee}`);
-            }
-        }
-        setAccountStatusMap(status);
-    };
-
     const fetchEmployees = async () => {
         try {
             const res = await axios.get("http://localhost:5112/api/employees", { withCredentials: true });
             setEmployees(res.data);
 
-            // Після оновлення списку працівників — завантажуємо статус акаунтів
             const status = {};
             for (const emp of res.data) {
                 try {
@@ -99,7 +85,7 @@ export default function EmployeesPage() {
                     });
                     status[emp.idEmployee] = accountRes.data.hasAccount;
                 } catch {
-                    status[emp.idEmployee] = false; // або undefined
+                    status[emp.idEmployee] = false;
                 }
             }
             setAccountStatusMap(status);
@@ -173,8 +159,8 @@ export default function EmployeesPage() {
         cloned.querySelectorAll("tr").forEach(row => {
             const cells = row.querySelectorAll("th, td");
             if (cells.length >= 2) {
-                cells[cells.length - 1].remove(); // "Акаунт"
-                cells[cells.length - 2].remove(); // "Дії"
+                cells[cells.length - 1].remove();
+                cells[cells.length - 2].remove();
             }
         });
         const content = cloned.innerHTML;

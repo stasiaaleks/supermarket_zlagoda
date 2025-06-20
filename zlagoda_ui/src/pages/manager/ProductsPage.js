@@ -102,7 +102,6 @@ export default function ProductsPage() {
     };
 
 
-
     const handlePrint = () => {
         const printWindow = window.open("", "_blank", "width=800,height=600");
         if (!printWindow) return;

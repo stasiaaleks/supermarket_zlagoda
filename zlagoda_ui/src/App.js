@@ -39,11 +39,34 @@ export default function App() {
                     }
                 />
 
-                <Route path="manager/checks" element={<ChecksPage />} />
 
-                <Route path="/manager/store-products" element={<StoreProductPage />} />
+                <Route
+                    path="manager/checks"
+                    element={
+                        <PrivateRoute role="Manager">
+                            <ChecksPage />
+                        </PrivateRoute>
+                    }
+                />
 
-                <Route path="/manager/cards" element={<CardsPage />} />
+                <Route
+                    path="/manager/store-products"
+                    element={
+                        <PrivateRoute role="Manager">
+                            <StoreProductPage />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/manager/cards"
+                    element={
+                        <PrivateRoute role="Manager">
+                            <CardsPage />
+                        </PrivateRoute>
+                    }
+                />
+
 
                 <Route
                     path="manager/categories"
