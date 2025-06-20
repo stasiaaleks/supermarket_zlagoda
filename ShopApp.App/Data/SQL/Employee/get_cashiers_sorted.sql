@@ -3,5 +3,5 @@
                 END AS has_account
 FROM employee
 LEFT JOIN "user" u ON employee.id_employee = u.id_employee
-WHERE role = 'cashier'
+WHERE employee.role = 'Cashier'
 ORDER BY surname;
