@@ -59,7 +59,15 @@ public class CustomerCardService : ICustomerCardService
 
     public async Task<bool> DeleteByNum(string number)
     {
-        var rows = await _cardRepo.DeleteByIdAsync(_queryProvider.DeleteByCardNum, number);
+        var param = new { CardNumber = number };
+        var existingEntity = await _cardRepo.GetSingleAsync(_queryProvider.GetByCardNum, param);
+
+        if (existingEntity == null)
+            throw new ArgumentException($"No customer card with number {number} was found.");
+
+        var rows = await _cardRepo.DeleteAsync(_queryProvider.DeleteByCardNum, param);
+
         return rows > 0;
     }
+
 }
