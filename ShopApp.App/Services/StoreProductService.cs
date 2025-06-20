@@ -117,7 +117,12 @@ public class StoreProductService : IStoreProductService
 
     public async Task<bool> DeleteStoreProduct(string upc)
     {
-        var rows = await _productRepo.DeleteByIdAsync(_queryProvider.DeleteByUpc, upc);
+        var productParams = new { UPC = upc };
+        var existingEntity = await _productRepo.GetSingleAsync(_queryProvider.GetByUpc, productParams);
+        if (existingEntity == null) 
+            throw new ArgumentException($"No store product with UPC '{upc}' was found.");
+
+        var rows = await _productRepo.DeleteAsync(_queryProvider.DeleteByUpc, productParams);
         return rows > 0;
     }
 

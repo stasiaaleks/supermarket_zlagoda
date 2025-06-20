@@ -11,6 +11,8 @@ export default function ChecksPage() {
     const [checkSalesMap, setCheckSalesMap] = useState({});
     const [totalSum, setTotalSum] = useState(null);
     const [error, setError] = useState("");
+    const [analyticsMessage, setAnalyticsMessage] = useState("");
+    const [storeProducts, setStoreProducts] = useState([]);
     const printRef = useRef();
 
     useEffect(() => {
@@ -22,6 +24,12 @@ export default function ChecksPage() {
     useEffect(() => {
         fetchChecks();
         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        axios.get("http://localhost:5112/api/store-products", { withCredentials: true })
+            .then(res => setStoreProducts(res.data))
+            .catch(() => setStoreProducts([]));
     }, []);
 
     const fetchChecks = async () => {
@@ -178,13 +186,37 @@ export default function ChecksPage() {
         }
     };
 
+    const fetchTotalSumAllCashiers = async (start, end) => {
+        const res = await axios.get("http://localhost:5112/api/checks/sum", {
+            params: { start, end },
+            withCredentials: true
+        });
+        return res.data.totalSum;
+    };
+
+    const fetchTotalSumByCashier = async (cashierId, start, end) => {
+        const res = await axios.get(`http://localhost:5112/api/checks/cashiers/${cashierId}/sum`, {
+            params: { start, end },
+            withCredentials: true
+        });
+        return res.data.totalSum;
+    };
+
+    const fetchTotalSoldProduct = async (upc, start, end) => {
+        const res = await axios.get(`http://localhost:5112/api/sales/${upc}/total`, {
+            params: { start, end },
+            withCredentials: true
+        });
+        return res.data.totalSold;
+    };
+
 
     return (
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="mb-0">Перегляд чеків</h2>
+                <h2 className="mb-0">Чеки</h2>
                 <button
-                    className="btn btn-outline-primary"
+                    className="btn btn-outline-secondary"
                     onClick={() => window.location.href = "/manager"}
                 >
                     Головне меню
@@ -295,6 +327,107 @@ export default function ChecksPage() {
                     </tbody>
                 </table>
             </div>
+            <div className="bg-light border rounded p-3 mt-5">
+                <h5 className="mb-4">Аналітика продажів</h5>
+
+                {/* 1. Сума по вибраному касиру */}
+                <form className="row g-3 align-items-end mb-4" onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!selectedCashier || !startDate || !endDate) return setAnalyticsMessage("Оберіть касира і період");
+                    try {
+                        const sum = await fetchTotalSumByCashier(selectedCashier, startDate, endDate);
+                        setAnalyticsMessage(`Загальна сума продажів касира за період: ${sum.toFixed(2)} грн`);
+                    } catch {
+                        setAnalyticsMessage("Не вдалося отримати суму для касира");
+                    }
+                }}>
+                    <div className="col-md-3">
+                        <label className="form-label">Касир</label>
+                        <select className="form-select" value={selectedCashier} onChange={e => setSelectedCashier(e.target.value)}>
+                            <option value="">Оберіть касира</option>
+                            {cashiers.map(c => (
+                                <option key={c.idEmployee} value={c.idEmployee}>{c.surname} {c.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="col-md-2">
+                        <label className="form-label">Від</label>
+                        <input type="date" className="form-control" value={startDate} onChange={e => setStartDate(e.target.value)} />
+                    </div>
+                    <div className="col-md-2">
+                        <label className="form-label">До</label>
+                        <input type="date" className="form-control" value={endDate} onChange={e => setEndDate(e.target.value)} />
+                    </div>
+                    <div className="col-md-3 d-grid">
+                        <button type="submit" className="btn btn-outline-primary">Сума по касиру</button>
+                    </div>
+                </form>
+
+                {/* 2. Загальна сума всіх продажів */}
+                <form className="row g-3 align-items-end mb-4" onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!startDate || !endDate) return setAnalyticsMessage("Оберіть період");
+                    try {
+                        const sum = await fetchTotalSumAllCashiers(startDate, endDate);
+                        setAnalyticsMessage(`Загальна сума продажів усіх касирів за період: ${sum.toFixed(2)} грн`);
+                    } catch {
+                        setAnalyticsMessage("Не вдалося отримати суму");
+                    }
+                }}>
+                    <div className="col-md-2">
+                        <label className="form-label">Від</label>
+                        <input type="date" className="form-control" value={startDate} onChange={e => setStartDate(e.target.value)} />
+                    </div>
+                    <div className="col-md-2">
+                        <label className="form-label">До</label>
+                        <input type="date" className="form-control" value={endDate} onChange={e => setEndDate(e.target.value)} />
+                    </div>
+                    <div className="col-md-3 d-grid">
+                        <button type="submit" className="btn btn-outline-success">Сума по всіх</button>
+                    </div>
+                </form>
+
+                {/* 3. Кількість проданого товару */}
+                <form className="row g-3 align-items-end mb-3" onSubmit={async (e) => {
+                    e.preventDefault();
+                    const upc = document.getElementById("product-upc").value.trim();
+                    if (!upc || !startDate || !endDate) return setAnalyticsMessage("Оберіть період і UPC товару");
+                    try {
+                        const total = await fetchTotalSoldProduct(upc, startDate, endDate);
+                        setAnalyticsMessage(`Загальна кількість проданого товару (UPC: ${upc}) за період: ${total}`);
+                    } catch {
+                        setAnalyticsMessage("Не вдалося отримати дані");
+                    }
+                }}>
+                    <div className="col-md-4">
+                        <label className="form-label">UPC товару</label>
+                        <select id="product-upc" className="form-select">
+                            <option value="">Оберіть товар</option>
+                            {storeProducts.map(p => (
+                                <option key={p.upc} value={p.upc}>{p.upc} ({p.productName})</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="col-md-2">
+                        <label className="form-label">Від</label>
+                        <input type="date" className="form-control" value={startDate} onChange={e => setStartDate(e.target.value)} />
+                    </div>
+                    <div className="col-md-2">
+                        <label className="form-label">До</label>
+                        <input type="date" className="form-control" value={endDate} onChange={e => setEndDate(e.target.value)} />
+                    </div>
+                    <div className="col-md-3 d-grid">
+                        <button type="submit" className="btn btn-outline-warning">Кількість товару</button>
+                    </div>
+                </form>
+
+                {analyticsMessage && <div className="alert alert-info mt-3">{analyticsMessage}</div>}
+            </div>
+
         </div>
     );
+
+
+
+
 }

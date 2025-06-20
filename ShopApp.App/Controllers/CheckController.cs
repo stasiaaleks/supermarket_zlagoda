@@ -64,7 +64,7 @@ public class CheckController : ControllerBase
     }
     
     [HttpGet("{number}/sales")]
-    [VerifyRole(EmployeeRoles.Manager)]
+    [VerifyRole(EmployeeRoles.Manager, EmployeeRoles.Cashier)]
     [ProducesResponseType(typeof(CheckWithSalesListDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByNumberWithSales([FromRoute] string number)
     {
