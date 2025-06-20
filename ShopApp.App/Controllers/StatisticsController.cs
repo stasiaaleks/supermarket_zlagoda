@@ -22,9 +22,9 @@ public class StatisticsController: ControllerBase
         return Ok(data);
     }
     
-    [HttpGet("same-checks-as/{surname}")]
+    [HttpGet("same-checks-as/")]
     [ProducesResponseType(typeof(IEnumerable<CashierCheckData>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCashiersWithSameChecks([FromRoute] string surname)
+    public async Task<IActionResult> GetCashiersWithSameChecks([FromQuery] string surname)
     {
         var data = await _statisticsService.GetCashiersWithSameChecks(surname);
         return Ok(data);
