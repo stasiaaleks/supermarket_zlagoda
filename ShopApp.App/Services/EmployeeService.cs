@@ -42,10 +42,10 @@ public class EmployeeService: IEmployeeService
     
     public async Task<IEnumerable<EmployeeDto>> GetAll()
     {
-        var query = _queryProvider.GetAllSortedBySurname; 
-        var employees = await _employeeRepo.GetAllAsync(query);
+        var query = _queryProvider.GetAll; 
+        var employees = await _employeeRepo.GetAllAsync<EmployeeDto>(query);
 
-        return _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+        return employees;
     }
 
     public async Task<IEnumerable<EmployeeDto>> GetAllCashiers()
@@ -59,23 +59,23 @@ public class EmployeeService: IEmployeeService
     public async Task<EmployeeDto> GetById(string id)
     {
         var query = _queryProvider.GetById; 
-        var employee = await _employeeRepo.GetByIdAsync(query,id); 
+        var employee = await _employeeRepo.GetByIdAsync<EmployeeDto>(query,id); 
         
         if (employee == null)
             throw new KeyNotFoundException($"Employee with id '{id}' not found.");
 
-        return _mapper.Map<EmployeeDto>(employee);
+        return employee;
     }
     
     public async Task<EmployeeDto> GetByUsername(string username)
     {
         var query = _queryProvider.GetByUsername; 
-        var employee = await _employeeRepo.GetSingleAsync(query, new { Username = username }); 
+        var employee = await _employeeRepo.GetSingleAsync<EmployeeDto>(query, new { Username = username }); 
         
         if (employee == null)
             throw new KeyNotFoundException($"Employee with username '{username}' not found.");
 
-        return _mapper.Map<EmployeeDto>(employee);
+        return employee;
     }
 
     public async Task<IEnumerable<EmployeeContactsDto>> GetContactsBySurname(string surname) 

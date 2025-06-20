@@ -33,6 +33,7 @@ public abstract class BaseEmployeeDto: IEmployeeDto
 public class EmployeeDto : BaseEmployeeDto
 {
     public string? IdEmployee { get; init; }
+    public bool? HasAccount { get; set; }
 }
 
 public class CreateEmployeeDto: BaseEmployeeDto { }
