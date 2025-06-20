@@ -8,7 +8,7 @@ WHERE e.surname != @Surname
     WHERE s.check_number = c.check_number
       AND s.upc NOT IN (
         SELECT sp.upc
-        FROM check AS cp
+        FROM "check" AS cp
                  INNER JOIN sale AS sp ON cp.check_number = sp.check_number
         WHERE cp.id_employee IN (
             SELECT id_employee
@@ -19,7 +19,7 @@ WHERE e.surname != @Surname
 )
   AND NOT EXISTS (
     SELECT cp.check_number
-    FROM check AS cp
+    FROM "check" AS cp
              INNER JOIN sale AS sp ON cp.check_number = sp.check_number
     WHERE cp.id_employee IN (
         SELECT id_employee
