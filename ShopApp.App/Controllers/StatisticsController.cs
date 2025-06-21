@@ -16,7 +16,7 @@ public class StatisticsController: ControllerBase
     }
     
     [HttpGet("cashier-prom-products/")]
-    [ProducesResponseType(typeof(IEnumerable<CashierPromProductsNumericData>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CashierPromProductsNumericData), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCashierPromProductsData([FromQuery] string idEmployee)
     {
         var data = await _statisticsService.GetPromProductsSumQuantityByCashier(idEmployee);

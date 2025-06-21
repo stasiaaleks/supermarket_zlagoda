@@ -8,7 +8,7 @@ namespace ShopApp.Services;
 
 public interface IStatisticsService
 {
-    Task<IEnumerable<CashierPromProductsNumericData>> GetPromProductsSumQuantityByCashier(string idEmployee);
+    Task<CashierPromProductsNumericData> GetPromProductsSumQuantityByCashier(string idEmployee);
     Task<IEnumerable<CashierCheckData>> GetCashiersWithSameChecks(string surname);
     Task<IEnumerable<CashierChecksCountData>> GetCashiersMinProductsMinChecks(int minProducts, int minChecks);
     Task<IEnumerable<ProductsSoldOnlyPromo>> GetProductsSoldOnlyPromo();
@@ -28,10 +28,10 @@ public class StatisticsService: IStatisticsService
         _queryProvider = queryProvider;
     }
 
-    public async Task<IEnumerable<CashierPromProductsNumericData>> GetPromProductsSumQuantityByCashier(string idEmployee)
+    public async Task<CashierPromProductsNumericData> GetPromProductsSumQuantityByCashier(string idEmployee)
     {
         var parameters = new { IdEmployee = idEmployee };
-        return await _repository.GetAllAsync<CashierPromProductsNumericData>(_queryProvider.GetPromProductsDataByCashier, parameters);
+        return await _repository.GetSingleAsync<CashierPromProductsNumericData>(_queryProvider.GetPromProductsDataByCashier, parameters);
     }
 
 
@@ -59,7 +59,7 @@ public class StatisticsService: IStatisticsService
     
     public async Task<IEnumerable<CustomersWithNumCategories>> GetCustomersWithNumCategories(int categoryCount)
     {
-        var parameters = new { CategoryCount = categoryCount };
+        var parameters = new { MinCategories = categoryCount };
         return await _repository.GetAllAsync<CustomersWithNumCategories>(_queryProvider.GetCustomersWithNumCategories, parameters);
     }  
 }
