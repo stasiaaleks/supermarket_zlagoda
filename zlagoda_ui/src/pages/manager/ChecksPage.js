@@ -136,7 +136,7 @@ export default function ChecksPage() {
             const content = detailedChecks.map((check) => `
             <h4>Чек №${check.checkNumber}</h4>
             <p>
-                <strong>Касир:</strong> ${check.idEmployee} <br/>
+                <strong>Касир:</strong> ${employeeMap[check.idEmployee]} <br/>
                 <strong>Картка:</strong> ${check.cardNumber || "-"} <br/>
                 <strong>Дата:</strong> ${new Date(check.printDate).toLocaleString()} <br/>
                 <strong>Сума:</strong> ${check.sumTotal.toFixed(2)} грн <br/>
