@@ -10,6 +10,12 @@ export default function StatisticsPage() {
     const [result3, setResult3] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [idEmployee, setIdEmployee] = useState("");
+    const [categoryName, setCategoryName] = useState("");
+    const [minCategories, setMinCategories] = useState(1);
+    const [result4, setResult4] = useState([]);
+    const [result5, setResult5] = useState([]);
+    const [result6, setResult6] = useState([]);
 
     const handleQuery1 = async () => {
         try {
@@ -62,6 +68,60 @@ export default function StatisticsPage() {
         } catch {
             setError("Помилка при виконанні запиту 3.");
             setResult3([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleQuery4 = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get("http://localhost:5112/api/statistics/cashier-prom-products", {
+                params: { idEmployee },
+                withCredentials: true
+            });
+            setResult4([res.data]);
+            setResult1([]); setResult2([]); setResult3([]); setResult5([]); setResult6([]);
+            setError("");
+        } catch {
+            setError("Помилка при виконанні запиту 4.");
+            setResult4([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleQuery5 = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get("http://localhost:5112/api/statistics/cashiers-sold-products-certain-category", {
+                params: { categoryName },
+                withCredentials: true
+            });
+            setResult5(res.data);
+            setResult1([]); setResult2([]); setResult3([]); setResult4([]); setResult6([]);
+            setError("");
+        } catch {
+            setError("Помилка при виконанні запиту 5.");
+            setResult5([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleQuery6 = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get("http://localhost:5112/api/statistics/customers-with-more-category-num", {
+                params: { minCategories },
+                withCredentials: true
+            });
+            setResult6(res.data);
+            setResult1([]); setResult2([]); setResult3([]); setResult4([]); setResult5([]);
+            setError("");
+        } catch {
+            setError("Помилка при виконанні запиту 6.");
+            setResult6([]);
         } finally {
             setLoading(false);
         }
@@ -198,6 +258,83 @@ export default function StatisticsPage() {
                 {loading && result3.length === 0 && <p className="text-center text-muted mt-3">Завантаження...</p>}
                 {error && result3.length === 0 && <div className="alert alert-danger text-center">{error}</div>}
                 {result3.length > 0 && renderTable(result3)}
+            </div>
+
+            {/* Запит 4 */}
+            <div className="card mb-4 shadow-sm">
+                <div className="card-body">
+                    <h5 className="card-title mb-4">
+                        Знайти загальну кількість та суму продажу <strong>акційних товарів</strong> для певного касира
+                    </h5>
+                    <div className="row g-2 align-items-end">
+                        <div className="col">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="ID касира"
+                                value={idEmployee}
+                                onChange={(e) => setIdEmployee(e.target.value)}
+                            />
+                        </div>
+                        <div className="col-auto">
+                            <button className="btn btn-primary" style={{ width: "180px" }} onClick={handleQuery4}>
+                                Виконати запит
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {loading && result4.length === 0 && <p className="text-center text-muted mt-3">Завантаження...</p>}
+                {error && result4.length === 0 && <div className="alert alert-danger text-center">{error}</div>}
+                {result4.length > 0 && renderTable(result4)}
+            </div>
+
+            {/* Запит 5 */}
+            <div className="card mb-4 shadow-sm">
+                <div className="card-body">
+                    <h5 className="card-title mb-4">
+                        Знайти всіх касирів, у кожному своєму чеку яких є товари з категорії <strong>@CategoryName</strong>
+                    </h5>
+                    <div className="row g-2 align-items-end">
+                        <div className="col">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Назва категорії"
+                                value={categoryName}
+                                onChange={(e) => setCategoryName(e.target.value)}
+                            />
+                        </div>
+                        <div className="col-auto">
+                            <button className="btn btn-primary" style={{ width: "180px" }} onClick={handleQuery5}>
+                                Виконати запит
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {loading && result5.length === 0 && <p className="text-center text-muted mt-3">Завантаження...</p>}
+                {error && result5.length === 0 && <div className="alert alert-danger text-center">{error}</div>}
+                {result5.length > 0 && renderTable(result5)}
+            </div>
+
+            {/* Запит 6 */}
+            <div className="card mb-4 shadow-sm">
+                <div className="card-body">
+                    <div className="row align-items-center justify-content-between">
+                        <div className="col">
+                            <h5 className="card-title mb-0">
+                                Знайти клієнтів, які мають картку та купували товари з щонайменше <strong>5 категорій</strong>
+                            </h5>
+                        </div>
+                        <div className="col-auto">
+                            <button className="btn btn-primary" style={{ width: "220px" }} onClick={handleQuery6}>
+                                Виконати запит
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {loading && result6.length === 0 && <p className="text-center text-muted mt-3">Завантаження...</p>}
+                {error && result6.length === 0 && <div className="alert alert-danger text-center">{error}</div>}
+                {result6.length > 0 && renderTable(result6)}
             </div>
         </div>
     );
